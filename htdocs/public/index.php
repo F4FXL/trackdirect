@@ -192,7 +192,7 @@
                     }
                     return false;"
                 title="Go to my current position">
-                <img src="images/mylocation.png" width="25px" height="25px" style="width: 25px; padding: 0px;">
+                <img src="/images/mylocation.png" width="25px" height="25px" style="width: 25px; padding: 0px;">
             </a>
 
             <div class="dropdown">
