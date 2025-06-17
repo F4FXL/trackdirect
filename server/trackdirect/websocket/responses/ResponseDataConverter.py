@@ -287,7 +287,7 @@ class ResponseDataConverter:
         """
         all_packet_dicts = []
 
-        if packet_dicts:
+        if packet_dicts and iteration_counter <= 0:
             related_station_ids = {}
             for packet_dict in packet_dicts:
                 if packet_dict['is_moving'] == 1 or packet_dict['packet_order_id'] == 1:
@@ -302,6 +302,7 @@ class ResponseDataConverter:
 
             if related_station_ids:
                 related_station_packets = self._get_related_station_packets_by_station_ids(list(related_station_ids.keys()))
+                related_station_packets = self._filter_latest_packets_by_station(related_station_packets) # make sure we only have packet for each related station, and be it the latest one
 
                 for related_station_id in related_station_ids.keys():
                     if related_station_id not in self.state.stations_on_map_dict:
@@ -315,6 +316,16 @@ class ResponseDataConverter:
 
         all_packet_dicts.extend(packet_dicts)
         return all_packet_dicts
+
+    def _filter_latest_packets_by_station(self, packets):
+        latest_by_station = {}
+        for packet in packets:
+            sid = packet.station_id
+            
+            if sid not in latest_by_station or packet.timestamp > latest_by_station[sid].timestamp:
+                latest_by_station[sid] = packet
+        
+        return list(latest_by_station.values())
 
     def _get_related_station_packets_by_station_ids(self, related_station_id_list):
         """Returns a list of the latest packet for the specified stations.
