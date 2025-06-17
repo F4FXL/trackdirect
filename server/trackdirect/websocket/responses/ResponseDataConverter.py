@@ -29,7 +29,7 @@ class ResponseDataConverter:
         self.packet_ogn_repository = PacketOgnRepository(db)
         self.ogn_device_repository = OgnDeviceRepository(db)
 
-    def get_response_data(self, packets, map_sector_list=None, flags=None, iteration_counter=0):
+    def get_response_data(self, packets, map_sector_list=None, flags=None, extend_related=True):
         """Create response data based on specified packets.
 
         Args:
@@ -66,7 +66,11 @@ class ResponseDataConverter:
 
             self._set_flags(packet_dict, flags)
             response_data.append(packet_dict)
-        return self._extend_response_with_more_packets(response_data, flags, iteration_counter)
+
+        if extend_related:
+            return self._extend_response_with_more_packets(response_data, flags)
+
+        return response_data
 
     def _get_packet_order_id(self, packets, index, flags):
         """Returns the order id of the packet at specified index.
@@ -274,7 +278,7 @@ class ResponseDataConverter:
         """
         return [packet.get_dict() for packet in packets]
 
-    def _extend_response_with_more_packets(self, packet_dicts, flags, iteration_counter):
+    def _extend_response_with_more_packets(self, packet_dicts, flags):
         """Extend the specified array with related packets.
 
         Args:
@@ -287,7 +291,7 @@ class ResponseDataConverter:
         """
         all_packet_dicts = []
 
-        if packet_dicts and iteration_counter <= 0:
+        if packet_dicts:
             related_station_ids = {}
             for packet_dict in packet_dicts:
                 if packet_dict['is_moving'] == 1 or packet_dict['packet_order_id'] == 1:
@@ -310,7 +314,7 @@ class ResponseDataConverter:
 
                 if related_station_packets:
                     related_station_packet_dicts = self.get_response_data(
-                        related_station_packets, None, ["latest", "related"] if "latest" in flags else ["related"], iteration_counter + 1
+                        related_station_packets, None, ["latest", "related"] if "latest" in flags else ["related"], False
                     )
                     all_packet_dicts.extend(related_station_packet_dicts)
 
