@@ -38,9 +38,11 @@ class MissingPacketsQuery:
         Returns:
             list: A sorted list of missing packets.
         """
+        present_station_ids = {packet.station_id for packet in found_packets}
+
         found_missing_packets = []
         for station_id in station_ids:
-            if not any(packet.station_id == station_id for packet in found_packets):
+            if station_id not in present_station_ids:
                 missing_packet = self._get_latest_packet(station_id)
                 if missing_packet is not None:
                     found_missing_packets.append(missing_packet)
