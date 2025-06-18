@@ -64,7 +64,7 @@ class FilterHistoryResponseCreator:
             min_timestamp = self.state.get_map_sector_timestamp(None) # None as argument is useful even when not dealing with map-sectors
         if (len(station_ids) > 1) :
             for stationId in station_ids :
-                timestamp = self.state.get_station_latest_timestamp_on_map(station_ids)
+                timestamp = self.state.get_station_latest_timestamp_on_map(stationId)
                 if (timestamp is not None and timestamp > min_timestamp) :
                     min_timestamp = timestamp
 
