@@ -156,3 +156,50 @@ jQuery(document).ready(function ($) {
     }
   });
 });
+
+
+function setMapType(value) {
+    trackdirect.setMapType(value)
+    const url = new URL(window.location);
+    url.searchParams.set('maptype', value);
+    window.history.pushState({}, '', url);
+}
+
+function setGrayscaleMode(enabled) {
+    const tilePane = document.querySelector('.leaflet-tile-pane');
+    if (!tilePane) return;
+
+    // Prend le filtre inline OU le filtre calculé (donc aussi défini en CSS)
+    let computed = getComputedStyle(tilePane).filter;
+    let current = tilePane.style.filter || '';
+    let baseFilter = current || (computed !== 'none' ? computed : '');
+    const hasGray = /grayscale\(100%\)/.test(baseFilter);
+
+    if (enabled === undefined) {
+        enabled = !hasGray;
+    }
+
+    let newFilter;
+    if (enabled) {
+        if (!hasGray) {
+            newFilter = baseFilter.trim() ? baseFilter.trim() + ' grayscale(100%)' : 'grayscale(100%)';
+        } else {
+            newFilter = baseFilter;
+        }
+    } else {
+        // Supprime uniquement grayscale(100%)
+        newFilter = baseFilter.replace(/\s*grayscale\(100%\)/, '').replace(/^ +| +$/g, '');
+    }
+    tilePane.style.filter = newFilter;
+
+    // Gérer le paramètre d'URL
+    const url = new URL(window.location);
+    if (enabled) {
+        url.searchParams.set('grayscale', '1');
+    } else {
+        url.searchParams.delete('grayscale');
+    }
+    window.history.replaceState({}, '', url);
+}
+
+

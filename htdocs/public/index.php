@@ -60,6 +60,7 @@ $safe_GET = sanitize_get($_GET)?>
         <link rel="stylesheet" href="/css/tweak-leaflet.css">
         <script>
             $(document).ready(function() {
+
                 google.charts.load('current', {'packages':['corechart', 'timeline']});
 
                 var options = {};
@@ -185,6 +186,9 @@ $safe_GET = sanitize_get($_GET)?>
                         var mapElementId = 'map-container';
 
                         trackdirect.init(wsServerUrl, mapElementId, options);
+
+                        //set grayscale once leaflet has been loaded
+                        setGrayscaleMode(<?php echo $safe_GET['grayscale'] ?? 0 ?>);
                     } else {
                         alert('This service require HTML 5 features to be able to feed you APRS data in real-time. Please upgrade your browser.');
                     }
@@ -280,10 +284,10 @@ $safe_GET = sanitize_get($_GET)?>
                     <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content" id="tdTopnavMapType">
-                    <a href="javascript:void(0);" onclick="trackdirect.setMapType('roadmap'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-active">Roadmap</a>
-                    <a href="javascript:void(0);" onclick="trackdirect.setMapType('terrain'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox">Terrain/Outdoors</a>
+                    <a href="javascript:void(0);" onclick="setMapType('roadmap'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-active">Roadmap</a>
+                    <a href="javascript:void(0);" onclick="setMapType('terrain'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox">Terrain/Outdoors</a>
                     <?php if ($mapapi == 'google' || getWebsiteConfig('leaflet_raster_tile_satellite') != null) : ?>
-                    <a href="javascript:void(0);" onclick="trackdirect.setMapType('satellite'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox">Satellite</a>
+                    <a href="javascript:void(0);" onclick="setMapType('satellite'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox">Satellite</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -309,6 +313,7 @@ $safe_GET = sanitize_get($_GET)?>
                     <a href="javascript:void(0);" onclick="trackdirect.toggleOgflymPositions(); $(this).toggleClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox" title="Hide model airplanes (OGFLYM)">Hide model airplanes (OGFLYM)</a>
                     <a href="javascript:void(0);" onclick="trackdirect.toggleUnknownPositions(); $(this).toggleClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox" title="Hide unknown aircrafts">Hide unknown aircrafts</a>
                     <?php endif; ?>
+                    <a href="javascript:void(0);" onclick="setGrayscaleMode(); $(this).toggleClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $safe_GET['grayscale'] == 1 ? "dropdown-content-checkbox-active":"" ?>" title="Grayscale Map" >Grayscale Map</a>
                 </div>
             </div>
 
