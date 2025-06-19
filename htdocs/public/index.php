@@ -128,8 +128,37 @@
                         // https://wiki.openstreetmap.org/wiki/Tile_servers
 
                         // Many providers require a map api key or similar, the following is an example for HERE
-                        L.TileLayer.Provider.providers['HERE'].options['app_id'] = '<?php echo getWebsiteConfig('here_app_id'); ?>';
-                        L.TileLayer.Provider.providers['HERE'].options['app_code'] = '<?php echo getWebsiteConfig('here_app_code'); ?>';
+                        //L.TileLayer.Provider.providers['HERE'].options['app_id'] = '<?php echo getWebsiteConfig('here_app_id'); ?>';
+                        //L.TileLayer.Provider.providers['HERE'].options['app_code'] = '<?php echo getWebsiteConfig('here_app_code'); ?>';
+
+                        L.TileLayer.Provider.providers['IGN'] = {
+							url: "https://data.geopf.fr/wmts?" +
+								"&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0" +
+								"&STYLE=normal" +
+								"&TILEMATRIXSET=PM" +
+								"&FORMAT=image/jpeg"+
+								"&LAYER=ORTHOIMAGERY.ORTHOPHOTOS"+
+							"&TILEMATRIX={z}" +
+								"&TILEROW={y}" +
+								"&TILECOL={x}",
+							options:{
+								minZoom : 0,
+								maxZoom : 18,
+										attribution : "IGN-F/Geoportail",
+								tileSize : 256 // les tuiles du Géooportail font 256x256px
+							}
+						}
+
+                        L.TileLayer.Provider.providers['FXLMap'] = {
+		                	url: 'https://{s}.f4fxl.org/tile/{z}/{x}/{y}.png',
+				            options: {
+					            minZoom: 0, 
+					            maxZoom: 25,
+					            subdomains: ["map1","map2","map3","map4"],
+					            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community' + 
+					            '<br>&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+							}
+						}
 
                         options['supportedMapTypes'] = {};
                         options['supportedMapTypes']['roadmap'] = "<?php echo getWebsiteConfig('leaflet_raster_tile_roadmap'); ?>";
@@ -219,9 +248,14 @@
                     <a href="javascript:void(0);" onclick="trackdirect.setTimeLength(720); $('#tdTopnavTimelength>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden">12 hours</a>
                     <a href="javascript:void(0);" onclick="trackdirect.setTimeLength(1080); $('#tdTopnavTimelength>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden">18 hours</a>
                     <a href="javascript:void(0);" onclick="trackdirect.setTimeLength(1440); $('#tdTopnavTimelength>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden">24 hours</a>
+                    <a href="javascript:void(0);" onclick="trackdirect.setTimeLength(2160); $('#tdTopnavTimelength>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden">36 hours</a>
+                    <a href="javascript:void(0);" onclick="trackdirect.setTimeLength(2880); $('#tdTopnavTimelength>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden">48 hours</a>
+                    <a href="javascript:void(0);" onclick="trackdirect.setTimeLength(4320); $('#tdTopnavTimelength>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden">72 hours</a>
+
                 </div>
             </div>
 
+            <?php if (getWebsiteConfig('google_key') != null ||  getWebsiteConfig('maptiler_key') != null) : ?>
             <div class="dropdown">
                 <button class="dropbtn">Map API
                     <i class="fa fa-caret-down"></i>
@@ -236,6 +270,8 @@
                     <?php endif; ?>
                 </div>
             </div>
+            <?php endif; ?>
+            
 
             <?php if ($mapapi != 'leaflet-vector') : ?>
             <div class="dropdown">
@@ -375,7 +411,7 @@
                         <p>Date and time:</p>
 
                         <form id="timetravel-form">
-                            <select id="timetravel-date" class="timetravel-select form-control"
+                            <select id="timetravel-date" class="timetravel-select form-control">
                                 <option value="0" selected>Select date</option>
                                 <?php for($i=0; $i <= 10; $i++) : ?>
                                     <?php $date = date('Y-m-d', strtotime("-$i days")); ?>
