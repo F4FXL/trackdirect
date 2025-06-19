@@ -1,4 +1,5 @@
-<?php require "../includes/bootstrap.php"; ?>
+<?php require "../includes/bootstrap.php"; 
+$safe_GET = sanitize_get($_GET)?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +26,7 @@
         <script src="/js/convex-hull.js" crossorigin="anonymous"></script>
 
         <!-- Map api javascripts and related dependencies -->
-        <?php $mapapi = $_GET['mapapi'] ?? 'leaflet'; ?>
+        <?php $mapapi = $safe_GET['mapapi'] ?? 'leaflet'; ?>
         <?php if ($mapapi == 'google') : ?>
             <?php if (getWebsiteConfig('google_key') != null) : ?>
                 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=<?php echo getWebsiteConfig('google_key'); ?>&libraries=visualization,geometry"></script>
@@ -72,18 +73,18 @@
                     options['isMobile'] = true;
                 }
 
-                options['time'] =       "<?php echo $_GET['time'] ?? '' ?>";        // How many minutes of history to show
-                options['center'] =     "<?php echo $_GET['center'] ?? '' ?>";      // Position to center on (for example "46.52108,14.63379")
-                options['zoom'] =       "<?php echo $_GET['zoom'] ?? '' ?>";        // Zoom level
-                options['timetravel'] = "<?php echo $_GET['timetravel'] ?? '' ?>";  // Unix timestamp to travel to
-                options['maptype'] =    "<?php echo $_GET['maptype'] ?? '' ?>";     // May be "roadmap", "terrain" or "satellite"
-                options['mid'] =        "<?php echo $_GET['mid'] ?? '' ?>";         // Render map from "Google My Maps" (requires https)
+                options['time'] =       "<?php echo $safe_GET['time'] ?? '' ?>";        // How many minutes of history to show
+                options['center'] =     "<?php echo $safe_GET['center'] ?? '' ?>";      // Position to center on (for example "46.52108,14.63379")
+                options['zoom'] =       "<?php echo $safe_GET['zoom'] ?? '' ?>";        // Zoom level
+                options['timetravel'] = "<?php echo $safe_GET['timetravel'] ?? '' ?>";  // Unix timestamp to travel to
+                options['maptype'] =    "<?php echo $safe_GET['maptype'] ?? '' ?>";     // May be "roadmap", "terrain" or "satellite"
+                options['mid'] =        "<?php echo $safe_GET['mid'] ?? '' ?>";         // Render map from "Google My Maps" (requires https)
 
                 options['filters'] = {};
-                options['filters']['sid'] = "<?php echo $_GET['sid'] ?? '' ?>";         // Station id to filter on
-                options['filters']['sname'] = "<?php echo $_GET['sname'] ?? '' ?>";     // Station name to filter on
-                options['filters']['sidlist'] = "<?php echo $_GET['sidlist'] ?? '' ?>";     // Station id list to filter on (colon separated)
-                options['filters']['snamelist'] = "<?php echo $_GET['snamelist'] ?? '' ?>"; // Station name list to filter on (colon separated)
+                options['filters']['sid'] = "<?php echo $safe_GET['sid'] ?? '' ?>";         // Station id to filter on
+                options['filters']['sname'] = "<?php echo $safe_GET['sname'] ?? '' ?>";     // Station name to filter on
+                options['filters']['sidlist'] = "<?php echo $safe_GET['sidlist'] ?? '' ?>";     // Station id list to filter on (colon separated)
+                options['filters']['snamelist'] = "<?php echo $safe_GET['snamelist'] ?? '' ?>"; // Station name list to filter on (colon separated)
 
                 // Tell jslib which html element to use to show connection status and mouse coordinates
                 options['statusContainerElementId'] = 'status-container';
@@ -191,7 +192,7 @@
                     $('#station-search').keypress(function (e) {
                         if (e.which == 13) {
                             var q = $('#station-search').val();
-                            loadView('/views/search.php?imperialUnits=<?php echo $_GET['imperialUnits'] ?? '0'; ?>&q=' + q + '&seconds=0');
+                            loadView('/views/search.php?imperialUnits=<?php echo $safe_GET['imperialUnits'] ?? '0'; ?>&q=' + q + '&seconds=0');
                         }
                     });
                 });
@@ -379,7 +380,7 @@
                 </div>
                 <div class="modal-content-body">
                     <div id="td-modal-content">
-                        <?php $view = getView($_GET['view']); ?>
+                        <?php $view = getView($safe_GET['view']); ?>
                         <?php if ($view) : ?>
                             <?php include($view); ?>
                         <?php else: ?>

@@ -1,6 +1,23 @@
 <?php
 
 /**
+ * protect against XSS
+ *
+ * @return santized get
+ */
+function sanitize_get($array) {
+    $result = [];
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $result[$key] = sanitize_get($value); // récursif pour tableaux
+        } else {
+            $result[$key] = htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        }
+    }
+    return $result;
+}
+
+/**
  * Returns true if user probably prefer Imperial Units
  *
  * @return boolean
