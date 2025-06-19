@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Si le fichier demandé existe, ne rien faire (laisser Apache servir le fichier)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Si l'URL est de la forme dotColorXXXXXX.png
+RewriteRule ^dotColor([0-9a-fA-F]{6})\.png$ dotColor.php?color=$1 [L,QSA]

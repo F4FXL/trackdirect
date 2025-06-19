@@ -399,7 +399,7 @@ trackdirect.MarkerCreator.prototype._convertToDotMarker = function (
  * @return {object}
  */
 trackdirect.MarkerCreator.prototype._getDotMarkerIcon = function (packet) {
-  let colorId = trackdirect.services.stationColorCalculator.getColorId(packet);
+  let colorId = trackdirect.services.stationColorCalculator.getColor(packet,true);
   let icon;
   if (typeof google === "object" && typeof google.maps === "object") {
     icon = {

@@ -1,10 +1,16 @@
 trackdirect.services.stationColorCalculator = {
-  _colors: [
-    "#3333ff", // blue       (#2A2AFF)
-    "#9900cc", // purple     (#7002A7)
-    "#006600", // green      (#005500)
-    "#cc0000", // red        (#A70202)
-  ],
+_colors: [
+  "#E53935", // strong red
+  "#8E24AA", // purple
+  "#3949AB", // vivid blue
+  "#00897B", // teal
+  "#FDD835", // dark yellow
+  "#FB8C00", // orange
+  "#6D4C41", // brown
+  "#43A047", // medium green (uniquement pour fonds urbains, éviter sur nature)
+  "#F4511E", // reddish orange
+  "#D81B60", // pink
+],
   _stationColorId: {},
 
   /**
@@ -12,9 +18,11 @@ trackdirect.services.stationColorCalculator = {
    * @param {object} packet
    * @return {string}
    */
-  getColor: function (packet) {
+  getColor: function (packet, trimmed=false) {
     let colorId = this.getColorId(packet);
-    return this._colors[colorId];
+    if(trimmed === false)
+      return this._colors[colorId];
+    return this._colors[colorId].replace("#", "");
   },
 
   /**

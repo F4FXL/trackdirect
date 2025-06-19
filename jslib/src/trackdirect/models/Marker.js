@@ -975,8 +975,8 @@ trackdirect.models.Marker.prototype._getGoogleMarkerOptions = function () {
   let opacity;
   let iconUrl;
   if (this._isDotMarker) {
-    let colorId = trackdirect.services.stationColorCalculator.getColorId(
-      this.packet
+    let colorId = trackdirect.services.stationColorCalculator.getColor(
+      this.packet, true
     );
     let iconUrl =
       trackdirect.settings.baseUrl +
@@ -1056,8 +1056,8 @@ trackdirect.models.Marker.prototype._getLeafletMarkerOptions = function () {
   let icon;
   let opacity;
   if (this._isDotMarker) {
-    let colorId = trackdirect.services.stationColorCalculator.getColorId(
-      this.packet
+    let colorId = trackdirect.services.stationColorCalculator.getColor(
+      this.packet, true
     );
     let iconUrl =
       trackdirect.settings.baseUrl +
