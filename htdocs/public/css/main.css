@@ -378,6 +378,12 @@ input[type=submit]:hover {
   font-family: "Sans-serif", "Helvetica";
 
   margin-bottom: 10px;
+
+  background-color: rgba(255, 255, 255, 0.7);
+  min-width: 130px;
+  border-radius: 10px;
+
+  padding: 5px 10px 5px 10px;
 }
 
 #right-container-filtered, #right-container-timetravel {
