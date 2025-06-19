@@ -285,10 +285,11 @@ a {
 }
 
 .modal-content-body {
-  height: calc(100% - 56px);
+  height: calc(100% - 60px);
   margin: 0px;
   padding: 0px;
   overflow: auto;
+  width: 100%;
 }
 
 input[type=text], select, textarea {
@@ -403,6 +404,7 @@ input[type=submit]:hover {
 
   font-size: 9pt;
   font-family: "Sans-serif", "Helvetica";
+  box-sizing: border-box;
 }
 
 
