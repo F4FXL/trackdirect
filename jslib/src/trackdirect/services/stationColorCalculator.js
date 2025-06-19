@@ -4,7 +4,6 @@ _colors: [
   "#8E24AA", // purple
   "#3949AB", // vivid blue
   "#00897B", // teal
-  "#FDD835", // dark yellow
   "#FB8C00", // orange
   "#6D4C41", // brown
   "#43A047", // medium green (uniquement pour fonds urbains, éviter sur nature)
