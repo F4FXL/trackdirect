@@ -450,8 +450,8 @@ if (isset($_GET['format']) && $_GET['format'] == 'png') {
     // }
 
     header('Pragma: public');
-    header('Cache-Control: max-age=86400, public');
-    header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+    header('Cache-Control: max-age=2592000, public');
+    header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 2592000));
     header('Content-type: image/png');
     echo $im->getImageBlob();
 
@@ -460,8 +460,8 @@ if (isset($_GET['format']) && $_GET['format'] == 'png') {
 } else {
 
     header('Pragma: public');
-    header('Cache-Control: max-age=86400, public');
-    header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+    header('Cache-Control: max-age=2592000, public');
+    header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 2592000));
     header('Content-type: image/svg+xml');
     echo $svgContent;
 }
