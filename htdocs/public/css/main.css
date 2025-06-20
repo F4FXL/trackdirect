@@ -326,7 +326,7 @@ input[type=submit]:hover {
 
 #coordinates-container {
   clear: both;
-  display: none;
+  /* display: none; */
   min-width: 130px;
 }
 
@@ -362,29 +362,52 @@ input[type=submit]:hover {
   justify-content: space-between;
 }
 
+/* #cordinate-container {
+  clear: both;
+  color: #4d4d4d;
+  font-size: 11px;
+  display: none;
+  min-width: 130px;
+} */
+
+#status-container {
+  white-space:nowrap;
+  line-height: 20px;
+  font-size: 11px;
+}
+
+@media screen and (min-width: 800px) {
+  #cordinates-container {
+    display: block;
+  }
+}
+
 #right-container {
   position: absolute;
   right: 0px;
-  margin-top: 10px;
   text-align: right;
 }
 
-#right-container-filtered, #right-container-timetravel {
+#right-container-info, #right-container-filtered, #right-container-timetravel, #coordinate-container {
   position:relative;
   right:10px;
   z-index:50;
 
-  color: #282828;
-  font-size: 12px;
+  color: #4d4d4d;
+  font-size:11px;
   font-family: "Sans-serif", "Helvetica";
 
   margin-bottom: 10px;
-
+    
   background-color: rgba(255, 255, 255, 0.7);
   min-width: 130px;
   border-radius: 10px;
 
   padding: 5px 10px 5px 10px;
+}
+
+#right-container-info {
+  margin-top: 10px;
 }
 
 #right-container-filtered, #right-container-timetravel {

@@ -90,7 +90,7 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
 
                 // Tell jslib which html element to use to show connection status and mouse coordinates
                 options['statusContainerElementId'] = 'status-container';
-                options['coordinatesContainerElementId'] = 'coordinate-container';
+                options['coordinatesContainerElementId'] = 'coordinate-container-content';
 
                 <?php if (isSourceIdUsed(5)) : ?>
                     // Adapt settings for OGN data
@@ -379,8 +379,10 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
 
         <div id="right-container">
             <div id="right-container-info">
-                <span id="status-container"></div>
-                < id="cordinates-container"></div>
+                <div  id="status-container"></div>
+            </div>
+            <div id="coordinate-container">
+                <span  id="coordinate-container-content"></span>
             </div>
             <div id="right-container-filtered">
                 <span id="right-container-filtered-content"></span>
@@ -489,7 +491,7 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
             </div>
         </div>
 
-        <div id="bottominfo-container">
+        <!-- <div id="bottominfo-container">
             <div style="margin-left: 10px; width: 350px;">
                 <span id="status-container"></span>
             </div>
@@ -499,6 +501,6 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
             <div style="margin-right:10px; width: 350px; text-align:right;">
                 <span id="coordinate-container"></span>
             </div>
-        </div>
+        </div> -->
     </body>
 </html>

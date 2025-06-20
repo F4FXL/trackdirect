@@ -1504,8 +1504,8 @@ trackdirect.models.Map.prototype._renderCoordinatesContainer = function (
     let content = "";
     content += this._getGpsDegreeFromGpsDecimal(lat.toFixed(5), "lat");
     content += " " + this._getGpsDegreeFromGpsDecimal(lng.toFixed(5), "lon");
-    content += "&nbsp;|&nbsp;" + lat.toFixed(5) + ", " + lng.toFixed(5);
-    content += "&nbsp;|&nbsp;" + this._getMaidenheadLocatorFromGpsDecimal(lat, lng);
+    content += "<br>" + lat.toFixed(5) + ", " + lng.toFixed(5);
+    content += "<br>" + this._getMaidenheadLocatorFromGpsDecimal(lat, lng);
 
     $("#" + options.coordinatesContainer).html(content);
   }
