@@ -14,9 +14,9 @@
   padding-bottom: 0px !important;
 }
 
-.leaflet-tile-pane {
+/* .leaflet-tile-pane {
     filter: opacity(70%);
-}
+} */
 
 .leaflet-marker-labeltext {
   background-color: transparent !important;
@@ -65,3 +65,10 @@ img[src*="dotColor"] {
     filter: unset !important;
 }
 
+.grayscale-tiles img {
+    filter: grayscale(100%) opacity(70%);
+}
+
+.grayscale-tiles-dummy img {
+  filter: grayscale(0%) opacity(70%);
+}

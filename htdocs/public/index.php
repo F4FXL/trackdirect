@@ -1,5 +1,6 @@
 <?php require "../includes/bootstrap.php"; 
-$safe_GET = sanitize_get($_GET)?>
+$safe_GET = sanitize_get($_GET);
+$mapType = $safe_GET['maptype'] ?? "roadmap" ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -78,7 +79,7 @@ $safe_GET = sanitize_get($_GET)?>
                 options['center'] =     "<?php echo $safe_GET['center'] ?? '' ?>";      // Position to center on (for example "46.52108,14.63379")
                 options['zoom'] =       "<?php echo $safe_GET['zoom'] ?? '' ?>";        // Zoom level
                 options['timetravel'] = "<?php echo $safe_GET['timetravel'] ?? '' ?>";  // Unix timestamp to travel to
-                options['maptype'] =    "<?php echo $safe_GET['maptype'] ?? '' ?>";     // May be "roadmap", "terrain" or "satellite"
+                options['mapType'] =    "<?php echo $mapType ?>";     // May be "roadmap", "terrain" or "satellite"
                 options['mid'] =        "<?php echo $safe_GET['mid'] ?? '' ?>";         // Render map from "Google My Maps" (requires https)
 
                 options['filters'] = {};
@@ -166,6 +167,17 @@ $safe_GET = sanitize_get($_GET)?>
                         options['supportedMapTypes']['roadmap'] = "<?php echo getWebsiteConfig('leaflet_raster_tile_roadmap'); ?>";
                         options['supportedMapTypes']['terrain'] = "<?php echo getWebsiteConfig('leaflet_raster_tile_terrain'); ?>";
                         options['supportedMapTypes']['satellite'] = "<?php echo getWebsiteConfig('leaflet_raster_tile_satellite'); ?>";
+
+                        // Make sure all tiles are stylable
+                        Object.values(L.TileLayer.Provider.providers).forEach(function(provider) {
+                            provider.options = provider.options || {};
+                            if (provider.options.className) {
+                                provider.options.className += ' grayscale-tiles-dummy';
+                            } else {
+                                provider.options.className = 'grayscale-tiles-dummy';
+                            }
+                        });
+
                     <?php endif; ?>
 
                     // host is used to create url to /heatmaps and /images (leave empty to use same host as website)
@@ -284,10 +296,10 @@ $safe_GET = sanitize_get($_GET)?>
                     <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content" id="tdTopnavMapType">
-                    <a href="javascript:void(0);" onclick="setMapType('roadmap'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $safe_GET['maptype'] == "roadmap" ? "dropdown-content-checkbox-active":"" ?>">Roadmap</a>
-                    <a href="javascript:void(0);" onclick="setMapType('terrain'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $safe_GET['maptype'] == "terrain" ? "dropdown-content-checkbox-active":"" ?>">Terrain/Outdoors</a>
+                    <a href="javascript:void(0);" onclick="setMapType('roadmap'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $mapType == "roadmap" ? "dropdown-content-checkbox-active":"" ?>">Roadmap</a>
+                    <a href="javascript:void(0);" onclick="setMapType('terrain'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $mapType == "terrain" ? "dropdown-content-checkbox-active":"" ?>">Terrain/Outdoors</a>
                     <?php if ($mapapi == 'google' || getWebsiteConfig('leaflet_raster_tile_satellite') != null) : ?>
-                    <a href="javascript:void(0);" onclick="setMapType('satellite'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $safe_GET['maptype'] == "satellite" ? "dropdown-content-checkbox-active":"" ?>">Satellite</a>
+                    <a href="javascript:void(0);" onclick="setMapType('satellite'); $('#tdTopnavMapType>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $mapType == "satellite" ? "dropdown-content-checkbox-active":"" ?>">Satellite</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -366,6 +378,10 @@ $safe_GET = sanitize_get($_GET)?>
         <div id="map-container"></div>
 
         <div id="right-container">
+            <div id="right-container-info">
+                <span id="status-container"></div>
+                < id="cordinates-container"></div>
+            </div>
             <div id="right-container-filtered">
                 <span id="right-container-filtered-content"></span>
                 <a href="#" onclick="trackdirect.filterOnStationId([]); return false;">reset</a>

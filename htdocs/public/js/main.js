@@ -166,34 +166,27 @@ function setMapType(value) {
 }
 
 function setGrayscaleMode(enabled) {
-    const tilePane = document.querySelector('.leaflet-tile-pane');
-    if (!tilePane) return;
-
-    // Prend le filtre inline OU le filtre calculé (donc aussi défini en CSS)
-    let computed = getComputedStyle(tilePane).filter;
-    let current = tilePane.style.filter || '';
-    let baseFilter = current || (computed !== 'none' ? computed : '');
-    const hasGray = /grayscale\(100%\)/.test(baseFilter);
+    // Cherche tous les conteneurs de tiles providers
+    var allTileContainers = document.querySelectorAll('.grayscale-tiles, .grayscale-tiles-dummy');
 
     if (enabled === undefined) {
-        enabled = !hasGray;
+        // Détecte l'état courant : s'il y a au moins un .grayscale-tiles, c'est en gris, sinon couleur
+        var isGray = document.querySelector('.grayscale-tiles') !== null;
+        enabled = !isGray;
     }
 
-    let newFilter;
-    if (enabled) {
-        if (!hasGray) {
-            newFilter = baseFilter.trim() ? baseFilter.trim() + ' grayscale(100%)' : 'grayscale(100%)';
+    allTileContainers.forEach(function(container) {
+        if (enabled) {
+            container.classList.remove('grayscale-tiles-dummy');
+            container.classList.add('grayscale-tiles');
         } else {
-            newFilter = baseFilter;
+            container.classList.remove('grayscale-tiles');
+            container.classList.add('grayscale-tiles-dummy');
         }
-    } else {
-        // Supprime uniquement grayscale(100%)
-        newFilter = baseFilter.replace(/\s*grayscale\(100%\)/, '').replace(/^ +| +$/g, '');
-    }
-    tilePane.style.filter = newFilter;
+    });
 
-    // Gérer le paramètre d'URL
-    const url = new URL(window.location);
+    // Gestion du paramètre d'URL
+    var url = new URL(window.location);
     if (enabled) {
         url.searchParams.set('grayscale', '1');
     } else {
@@ -201,5 +194,6 @@ function setGrayscaleMode(enabled) {
     }
     window.history.replaceState({}, '', url);
 }
+
 
 
