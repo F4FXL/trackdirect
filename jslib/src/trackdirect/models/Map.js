@@ -1502,8 +1502,8 @@ trackdirect.models.Map.prototype._renderCoordinatesContainer = function (
 
   if (lat <= 90 && lat >= -90 && lng <= 180 && lng >= -180) {
     let content = "";
-    content += this._getGpsDegreeFromGpsDecimal(lat.toFixed(5), "lat");
-    content += " " + this._getGpsDegreeFromGpsDecimal(lng.toFixed(5), "lon");
+    content += this._getGpsDegreeFromGpsDecimal(lat, "lat");
+    content += " " + this._getGpsDegreeFromGpsDecimal(lng, "lon");
     content += "<br>" + lat.toFixed(5) + ", " + lng.toFixed(5);
     content += "<br>" + this._getMaidenheadLocatorFromGpsDecimal(lat, lng);
 
@@ -1550,7 +1550,7 @@ trackdirect.models.Map.prototype._getGpsDegreeFromGpsDecimal = function (
   if (type == "lat") direction = days < 0 ? "S" : "N";
   if (type == "lon") direction = days < 0 ? "W" : "E";
   //else return value
-  return days * sign + "º " + minutes + "' " + secounds + "'' " + direction;
+  return (days * sign).toString().padStart(type == "lat" ? 2 : 3, "0") + "º " + minutes.toString().padStart(2, "0") + "' " + secounds.toString().padStart(2, "0") + "'' " + direction;
 };
 
 /**

@@ -324,12 +324,6 @@ input[type=submit]:hover {
   width:  100%;
 }
 
-#coordinates-container {
-  clear: both;
-  /* display: none; */
-  min-width: 130px;
-}
-
 #status-container {
   font-weight: bold;
   white-space:nowrap;
@@ -340,7 +334,7 @@ input[type=submit]:hover {
 }
 
 @media screen and (min-width: 1100px) {
-  #coordinates-container {
+  #cordinates-container {
     display: block;
   }
   #status-container {
@@ -362,13 +356,15 @@ input[type=submit]:hover {
   justify-content: space-between;
 }
 
-/* #cordinate-container {
+
+#cordinates-container {
   clear: both;
   color: #4d4d4d;
-  font-size: 11px;
+  font-size: 12px;
   display: none;
   min-width: 130px;
-} */
+  display: none;
+}
 
 #status-container {
   white-space:nowrap;
@@ -388,7 +384,7 @@ input[type=submit]:hover {
   text-align: right;
 }
 
-#right-container-info, #right-container-filtered, #right-container-timetravel, #coordinate-container {
+#right-container-info, #right-container-filtered, #right-container-timetravel {
   position:relative;
   right:10px;
   z-index:50;
@@ -397,9 +393,9 @@ input[type=submit]:hover {
   font-size:11px;
   font-family: "Sans-serif", "Helvetica";
 
-  margin-bottom: 10px;
+  margin-bottom: 12px;
     
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.8);
   min-width: 130px;
   border-radius: 10px;
 

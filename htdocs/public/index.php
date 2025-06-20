@@ -90,7 +90,7 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
 
                 // Tell jslib which html element to use to show connection status and mouse coordinates
                 options['statusContainerElementId'] = 'status-container';
-                options['coordinatesContainerElementId'] = 'coordinate-container-content';
+                options['coordinatesContainerElementId'] = 'cordinates-container';
 
                 <?php if (isSourceIdUsed(5)) : ?>
                     // Adapt settings for OGN data
@@ -377,7 +377,7 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
 
         <div id="map-container"></div>
 
-        <div id="right-container">
+        <!-- <div id="right-container">
             <div id="right-container-info">
                 <div  id="status-container"></div>
             </div>
@@ -391,6 +391,23 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
 
             <div id="right-container-timetravel">
                 <span id="right-container-timetravel-content"></span>
+                <a href="#" onclick="trackdirect.setTimeTravelTimestamp(0); $('#right-container-timetravel').hide(); return false;">reset</a>
+            </div>
+        </div> -->
+
+       <div id="right-container">
+            <div id="right-container-info">
+                <div id="status-container"></div>
+                <div id="cordinates-container"></div>
+            </div>
+
+            <div id="right-container-filtered">
+                <div id="right-container-filtered-content"></div>
+                <a href="#" onclick="trackdirect.filterOnStationId([]); return false;">reset</a>
+            </div>
+
+            <div id="right-container-timetravel">
+                <div id="right-container-timetravel-content"></div>
                 <a href="#" onclick="trackdirect.setTimeTravelTimestamp(0); $('#right-container-timetravel').hide(); return false;">reset</a>
             </div>
         </div>
