@@ -7,13 +7,13 @@ header('Content-type: image/png');
 $zoom = $_GET['zoom'] ?? 0;
 $x = $_GET['x'] ?? 0;
 $y = $_GET['y'] ?? 0;
-$filename = 'heatmap.'.$zoom.'.'.$x.'.'.$y.'.png';
+// $filename = 'heatmap.'.$zoom.'.'.$x.'.'.$y.'.png';
 
-if (file_exists($filename) && time()-filemtime($filename) < 3600) {
-    // File exists and is not older than 1 hour
-    readfile($filename);
-    exit;
-}
+// if (file_exists($filename) && time()-filemtime($filename) < 3600) {
+//     // File exists and is not older than 1 hour
+//     readfile($filename);
+//     exit;
+// }
 
 require dirname(__DIR__) . "../../includes/bootstrap.php";
 require_once('gd-heatmap/gd_heatmap.php');
@@ -78,9 +78,9 @@ $config = array(
 
 $heatmap = new gd_heatmap($data, $config);
 
-if (is_writable(dirname($filename))) {
-    $heatmap->output($filename);
-    readfile($filename);
-} else {
-    $heatmap->output();
-}
+// if (is_writable(dirname($filename))) {
+//     $heatmap->output($filename);
+//     readfile($filename);
+// } else {
+$heatmap->output();
+// }
