@@ -79,7 +79,7 @@ $mapType = $safe_GET['maptype'] ?? "roadmap" ?>
                 options['center'] =     "<?php echo $safe_GET['center'] ?? '' ?>";      // Position to center on (for example "46.52108,14.63379")
                 options['zoom'] =       "<?php echo $safe_GET['zoom'] ?? '' ?>";        // Zoom level
                 options['timetravel'] = "<?php echo $safe_GET['timetravel'] ?? '' ?>";  // Unix timestamp to travel to
-                options['mapType'] =    "<?php echo $mapType ?>";     // May be "roadmap", "terrain" or "satellite"
+                options['maptype'] =    "<?php echo $mapType ?>";     // May be "roadmap", "terrain" or "satellite"
                 options['mid'] =        "<?php echo $safe_GET['mid'] ?? '' ?>";         // Render map from "Google My Maps" (requires https)
 
                 options['filters'] = {};
