@@ -33,7 +33,7 @@ if (!inIframe()) {
 
 // Set correct time length option to active
 jQuery(document).ready(function ($) {
-  $("#tdTopnavTimelengthDefault").addClass("dropdown-content-checkbox-active");
+  // document.querySelectorAll('.tdTopnavTimelengthDefault').forEach(toggleCheckBox);
 });
 
 // Open all internal url's in dialog
@@ -69,18 +69,20 @@ jQuery(document).ready(function ($) {
 jQuery(document).ready(function ($) {
   $("#td-modal-close").bind('click', function(e) {
     $('#td-modal').hide();
-    history.replaceState(null, "", "/");
+    let url = new URL(window.location);
+    url.pathname = ""; //we are closing a view, clear the path
+    url.searchParams.delete("id"); //cleanup id, if any
+    history.replaceState(null, "", url.toString().replace("%2C", ","));
   });
 });
 
 // Open station dialog if user clicked on station name
 jQuery(document).ready(function ($) {
   trackdirect.addListener("station-name-clicked", function (data) {
-    if (trackdirect.isImperialUnits()) {
-      loadView("/views/overview.php?id=" + data.station_id + "&imperialUnits=1");
-    } else {
-      loadView("/views/overview.php?id=" + data.station_id + "&imperialUnits=0");
-    }
+    let url = new URL(window.location);
+    url.searchParams.set("id", data.station_id);
+    url.pathname = "/views/overview.php";
+    loadView(url.toString().replace("%2C", ","));
   });
 });
 
@@ -88,40 +90,18 @@ jQuery(document).ready(function ($) {
 jQuery(document).ready(function ($) {
   var newUrlTimeoutId = null;
   trackdirect.addListener("position-request-sent", function (data) {
-    if (newUrlTimeoutId !== null) {
-      clearTimeout(newUrlTimeoutId);
-    }
-
-    newUrlTimeoutId = window.setTimeout(function () {
       if ($("#td-modal").is(":hidden")) {
-        var url = window.location.href.split('/').pop();
+        let url = new URL(window.location);
+
         var newLat = Math.round(data.center.lat * 10000) / 10000;
         var newLng = Math.round(data.center.lng * 10000) / 10000;
         var newZoom = data.zoom;
 
-        if (!url.includes("center=")) {
-          if (!url.includes("?")) {
-            url += "?center=" + newLat + "," + newLng;
-          } else {
-            url += "&center=" + newLat + "," + newLng;
-          }
-        } else {
-          url = url.replace(/center=[^&]*/i, "center=" + newLat + "," + newLng);
-        }
+        url.searchParams.set('center',  + newLat + "," + newLng);
+        url.searchParams.set('zoom', newZoom);
 
-        if (!url.includes("zoom=")) {
-          if (!url.includes("?")) {
-            url += "?zoom=" + newZoom;
-          } else {
-            url += "&zoom=" + newZoom;
-          }
-        } else {
-          url = url.replace(/zoom=[^&]*/i, "zoom=" + newZoom);
-        }
-
-        history.replaceState(null, "", url);
-      }
-    }, 1000);
+        window.history.replaceState({}, '', url.toString().replace("%2C", ","));//dirty hack to ensure we have , instead of %2C in the URL
+    }
   });
 });
 
@@ -136,9 +116,9 @@ jQuery(document).ready(function ($) {
       $("#right-container-timetravel").hide();
 
       // Reset tail length to default when filtering is stopped
-      $("#tdTopnavTimelength>a").removeClass("dropdown-content-checkbox-active");
-      $("#tdTopnavTimelengthDefault").addClass("dropdown-content-checkbox-active");
       $(".dropdown-content-checkbox-only-filtering").addClass("dropdown-content-checkbox-hidden");
+      toggleCheckBox(document.getElementById('tdTopnavTimelengthDefault'));
+      
     } else {
       var counts = {};
       for (var i = 0; i < packets.length; i++) {
@@ -161,39 +141,147 @@ jQuery(document).ready(function ($) {
 function setMapType(value) {
     trackdirect.setMapType(value)
     const url = new URL(window.location);
-    url.searchParams.set('maptype', value);
+    if(value != 'roadmap')
+      url.searchParams.set('maptype', value);
+    else
+      url.searchParams.delete('maptype');
     window.history.pushState({}, '', url);
+    setGrayscaleMode();
 }
 
 function setGrayscaleMode(enabled) {
-    // Cherche tous les conteneurs de tiles providers
-    var allTileContainers = document.querySelectorAll('.grayscale-tiles, .grayscale-tiles-dummy');
+  // Cherche tous les conteneurs de tiles providers
+  var allTileContainers = document.querySelectorAll('.grayscale-tiles, .grayscale-tiles-dummy');
 
-    if (enabled === undefined) {
+  if (enabled === undefined) {
+      // check if we have grayscale in url
+      let url = new URL(window.location);
+      if(url.searchParams.get('grayscale')) {
+        enabled = url.searchParams.get('grayscale') == '1';
+      }
+      else {
         // Détecte l'état courant : s'il y a au moins un .grayscale-tiles, c'est en gris, sinon couleur
         var isGray = document.querySelector('.grayscale-tiles') !== null;
         enabled = !isGray;
-    }
+      }
+  }
 
-    allTileContainers.forEach(function(container) {
-        if (enabled) {
-            container.classList.remove('grayscale-tiles-dummy');
-            container.classList.add('grayscale-tiles');
-        } else {
-            container.classList.remove('grayscale-tiles');
-            container.classList.add('grayscale-tiles-dummy');
-        }
-    });
+  allTileContainers.forEach(function(container) {
+      if (enabled) {
+          container.classList.remove('grayscale-tiles-dummy');
+          container.classList.add('grayscale-tiles');
+      } else {
+          container.classList.remove('grayscale-tiles');
+          container.classList.add('grayscale-tiles-dummy');
+      }
+  });
 
-    // Gestion du paramètre d'URL
-    var url = new URL(window.location);
-    if (enabled) {
-        url.searchParams.set('grayscale', '1');
-    } else {
-        url.searchParams.delete('grayscale');
-    }
-    window.history.replaceState({}, '', url);
+  // Gestion du paramètre d'URL
+  var url = new URL(window.location);
+  if (enabled) {
+      url.searchParams.set('grayscale', '1');
+  } else {
+      url.searchParams.delete('grayscale');
+  }
+  window.history.replaceState({}, '', url);
 }
 
+// Handle click on checkbox links
+jQuery(document).ready(function ($) {
+  document.querySelectorAll('.toggle-checkbox').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      toggleCheckBox(anchor, '.toggle-checkbox', 'fa-square', 'fa-check-square');
+    });
+  });
 
+  document.querySelectorAll('.toggle-checkbox-eye').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      toggleCheckBox(anchor, '.toggle-checkbox-eye', 'fa-eye', 'fa-eye-slash');
+    });
+  });
+});
 
+function toggleCheckBox(anchor, cls, unchecked, checked) {
+  const icon = anchor.querySelector('i');
+  const group = anchor.dataset.group;
+
+  if (group) {
+    // Mode radio (une seule case cochée par groupe)
+    document.querySelectorAll(cls + '[data-group="' + group + '"]').forEach(other => {
+      const iconOther = other.querySelector('i');
+      iconOther.classList.remove(checked);
+      iconOther.classList.add(unchecked);
+    });
+    // Toujours cocher la case cliquée
+    icon.classList.remove(unchecked);
+    icon.classList.add(checked);
+  } else {
+    // Mode case isolée (toggle classique)
+    icon.classList.toggle(unchecked);
+    icon.classList.toggle(checked);
+  }
+}
+
+function setTimeLength(time)
+{
+  trackdirect.setTimeLength(time);
+  var url = new URL(window.location);
+  url.searchParams.set('time', time);
+  window.history.replaceState({}, '', url);
+}
+
+function toggleImperialUnits()
+{
+  trackdirect.toggleImperialUnits();
+  var url = new URL(window.location);
+  if(trackdirect.isImperialUnits())
+    url.searchParams.set('imperialUnits', 1);
+  else
+    url.searchParams.delete('imperialUnits');
+  window.history.replaceState({}, '', url);
+}
+
+function toggleCircles(anchor, rng = false)
+{
+  let state = 0;
+  if(rng) {
+    trackdirect.toggleRNGCircles();
+    state = trackdirect.getRNGCirclesState();
+  }
+  else {
+    trackdirect.togglePHGCircles();
+    state = trackdirect.getPHGCirclesState();
+  }
+  var url = new URL(window.location);
+
+  if(state != 0) {
+    url.searchParams.set(rng ? 'rng' : 'phg', state);
+  }
+  else {
+    url.searchParams.delete(rng ? 'rng' : 'phg');
+  }
+
+  window.history.replaceState({}, '', url);
+
+  const icon = anchor.querySelector('i');
+  icon.classList.remove('fas')
+  icon.classList.remove('far')
+  icon.classList.remove('fa-eye');
+  icon.classList.remove('fa-eye-slash');
+
+  switch(state)
+  {
+    case 0:
+      icon.classList.add('far');
+      icon.classList.add('fa-eye-slash');
+      break;
+    case 1:
+      icon.classList.add('far');
+      icon.classList.add('fa-eye');
+      break;
+    case 2:
+      icon.classList.add('fas');
+      icon.classList.add('fa-eye');
+      break;
+  }
+}

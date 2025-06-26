@@ -1,0 +1,11 @@
+.sidebar-close
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar-close i {
+  font-size: 32px; 
+  color: #fff;
+}

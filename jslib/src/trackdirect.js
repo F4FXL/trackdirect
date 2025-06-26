@@ -720,8 +720,20 @@ var trackdirect = {
     this._map.showHidePHGCircles();
   },
 
+  getPHGCirclesState: function () {
+    return this._map.state.showPHGCircles;
+  },
+
+  setPHGCirclesState: function (state) {
+    if(state >= 0 && state <= 2)
+      this._map.state.showPHGCircles = state;
+    else
+      this._map.state.showPHGCircles = 0;
+    this._map.showHidePHGCircles();
+  },
+
   /**
-   * Toggle PHG circles
+   * Toggle RNG circles
    * @return None
    */
   toggleRNGCircles: function () {
@@ -733,6 +745,18 @@ var trackdirect = {
     } else {
       state.showRNGCircles = 0;
     }
+    this._map.showHideRNGCircles();
+  },
+
+  getRNGCirclesState: function () {
+    return this._map.state.showRNGCircles;
+  },
+
+  setRNGCirclesState: function (state) {
+    if(state >= 0 && state <= 2)
+      this._map.state.showRNGCircles = state;
+    else
+      this._map.state.showRNGCircles = 0;
     this._map.showHideRNGCircles();
   },
 

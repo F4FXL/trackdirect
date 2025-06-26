@@ -49,10 +49,10 @@ a {
 /* Set the position of the map */
 #map-container {
   position:absolute;
-  top: 39px;
+  top: 0px;
   left: 0px;
   width: 100%;
-  height: calc( 100% - 62px );
+  height: 100%; /*calc( 100% - 62px );*/
   z-index:10;
 }
 
@@ -927,3 +927,10 @@ input[type=submit]:hover {
 .gm-style .gm-style-iw-d {
   margin-top: -30px;
 }
+
+.toggle-checkbox, .toggle-checkbox-eye, .toggle-checkbox-eye-no-auto {
+	font-size: 1.3em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
+}
+

@@ -1,12 +1,6 @@
 <?php require "../includes/bootstrap.php"; 
 $safe_GET = sanitize_get($_GET);
-$mapType = in_array(strtolower($safe_GET['maptype']), ["roadmap", "terrain", "satellite"]) ? strtolower($safe_GET['maptype']) : "roadmap";
-$time = in_array((int)$safe_GET['time'], [10, 30, 60, 180, 360]) ? $safe_GET['time'] : 60;
-$grayscale = $safe_GET['grayscale'] == 1 ? 1 : 0;
-$imperialunits = $safe_GET['imperialUnits'] == 1 || isImperialUnitUser() ? 1 : 0;
-$phg = in_array((int)$safe_GET['phg'], [0, 1, 2]) ? (int)$safe_GET['phg'] : 0;
-$rng = in_array((int)$safe_GET['rng'], [0, 1, 2]) ? (int)$safe_GET['rng'] : 0;
-$mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapapi'] : 'leaflet'; ?>
+$mapType = $safe_GET['maptype'] ?? "roadmap" ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,8 +26,8 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
         <script src="https://cdnjs.cloudflare.com/ajax/libs/autolinker/3.14.2/Autolinker.min.js" integrity="sha512-qyoXjTIJ69k6Ik7CxNVKFAsAibo8vW/s3WV3mBzvXz6Gq0yGup/UsdZBDqFwkRuevQaF2g7qhD3E4Fs+OwS4hw==" crossorigin="anonymous"></script>
         <script src="/js/convex-hull.js" crossorigin="anonymous"></script>
 
-
         <!-- Map api javascripts and related dependencies -->
+        <?php $mapapi = $safe_GET['mapapi'] ?? 'leaflet'; ?>
         <?php if ($mapapi == 'google') : ?>
             <?php if (getWebsiteConfig('google_key') != null) : ?>
                 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=<?php echo getWebsiteConfig('google_key'); ?>&libraries=visualization,geometry"></script>
@@ -61,16 +55,10 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
         <!-- Track Direct jslib -->
         <script type="text/javascript" src="/js/trackdirect.min.js"></script>
 
-        <!-- sidebar stuff -->
-        <!-- sidebar from https://github.com/locr-company/sidebar-v2/commit/15b24e81ba7f794e2d84514df5fea7922d985341 -->
-        <script src="/js/leaflet-sidebar.min.js" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="/css/leaflet-sidebar.min.css">
-
 
         <script type="text/javascript" src="/js/main.js"></script>
         <link rel="stylesheet" href="/css/main.css">
         <link rel="stylesheet" href="/css/tweak-leaflet.css">
-        <link rel="stylesheet" href="/css/leaflet-sidebar-tweak.css">
         <script>
             $(document).ready(function() {
 
@@ -87,13 +75,12 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                     options['isMobile'] = true;
                 }
 
-                options['time'] =       "<?php echo $time ?>";        // How many minutes of history to show
+                options['time'] =       "<?php echo $safe_GET['time'] ?? '' ?>";        // How many minutes of history to show
                 options['center'] =     "<?php echo $safe_GET['center'] ?? '' ?>";      // Position to center on (for example "46.52108,14.63379")
                 options['zoom'] =       "<?php echo $safe_GET['zoom'] ?? '' ?>";        // Zoom level
                 options['timetravel'] = "<?php echo $safe_GET['timetravel'] ?? '' ?>";  // Unix timestamp to travel to
                 options['maptype'] =    "<?php echo $mapType ?>";     // May be "roadmap", "terrain" or "satellite"
                 options['mid'] =        "<?php echo $safe_GET['mid'] ?? '' ?>";         // Render map from "Google My Maps" (requires https)
-                options['useImperialUnit'] = <?php echo $imperialunits == 1 ? 1:0 ?>;
 
                 options['filters'] = {};
                 options['filters']['sid'] = "<?php echo $safe_GET['sid'] ?? '' ?>";         // Station id to filter on
@@ -176,8 +163,6 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
 							}
 						}
 
-                        options['time'] = <?php echo $time ?>;
-
                         options['supportedMapTypes'] = {};
                         options['supportedMapTypes']['roadmap'] = "<?php echo getWebsiteConfig('leaflet_raster_tile_roadmap'); ?>";
                         options['supportedMapTypes']['terrain'] = "<?php echo getWebsiteConfig('leaflet_raster_tile_terrain'); ?>";
@@ -191,25 +176,6 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                             } else {
                                 provider.options.className = 'grayscale-tiles-dummy';
                             }
-                        });
-                        window.sidebar = null;
-                        // add sidebar
-                        trackdirect.addListener("map-created", function() {
-                            map = trackdirect._map
-                            const sidebarOptions = {
-                                    position: 'left'
-                            };
-                            window.sidebar = L.control.sidebar('sidebar', sidebarOptions).addTo(map);
-                        });
-
-                        //handle grayscale
-                        trackdirect.addListener("map-created", function() {
-                            //set grayscale once leaflet has been loaded
-                            setGrayscaleMode(<?php echo $grayscale ?>);
-                            // set PHG from URL
-                            trackdirect.setPHGCirclesState(<?php echo $phg; ?>);
-                            // set RNG from URL
-                            trackdirect.setRNGCirclesState(<?php echo $rng; ?>);
                         });
 
                     <?php endif; ?>
@@ -232,6 +198,9 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                         var mapElementId = 'map-container';
 
                         trackdirect.init(wsServerUrl, mapElementId, options);
+
+                        //set grayscale once leaflet has been loaded
+                        setGrayscaleMode(<?php echo $safe_GET['grayscale'] ?? 0 ?>);
                     } else {
                         alert('This service require HTML 5 features to be able to feed you APRS data in real-time. Please upgrade your browser.');
                     }
@@ -247,109 +216,8 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
         </script>
     </head>
     <body>
-
-
-        <div id="sidebar" class="sidebar collapsed">
-            <!-- Nav tabs -->
-            <div class="sidebar-tabs">
-                <ul role="tablist">
-                    <!-- <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li> -->
-                    <li> 
-                        <a  role="tab"
-                            href=""
-                            onclick="
-                                window.sidebar.close();
-                                if (location.protocol != 'https:') {
-                                    trackdirect.setCenter(); // Will go to default position
-                                } else {
-                                    trackdirect.setMapLocationByGeoLocation(
-                                        function(errorMsg) {
-                                            var msg = 'We failed to determine your current location by using HTML 5 Geolocation functionality';
-                                            if (typeof errorMsg !== 'undefined' && errorMsg != '') {
-                                                msg += ' (' + errorMsg + ')';
-                                            }
-                                            msg += '.';
-                                            alert(msg);
-                                        },
-                                        function() {},
-                                        5000
-                                    );
-                                }
-                                return false;"
-                            title="Go to my current position">
-                            <i class="fa-crosshairs fa"></i>
-                        </a>
-                    </li>
-                    <li><a href="#sb-tail-length" role="tab" title="Select history duration shown on map"><i class="fas fa-clock"></i></a></li>
-                    <li><a href="#sb-map-type" role="tab" title="Switch between map types"><i class="fas fa-map"></i></a></li>
-                    <li><a href="#sb-show-hide" role="tab" title="Show hide items on the map"><i class="far fa-eye"></i></a>
-                </ul>
-
-                <ul role="tablist">
-                    <li><a href="#sb-settings" role="tab"><i class="fa fa-cog"></i></a></li>
-                </ul>
-            </div>
-
-            <!-- Tab panes -->
-            <div class="sidebar-content">
-                <!-- <div class="sidebar-pane" id="home">
-                    <h1 class="sidebar-header"><?php echo getWebsiteConfig('title'); ?></h1>
-                </div> -->
-
-                <div class="sidebar-pane" id="sb-tail-length">
-                    <h1 class="sidebar-header">Tail length</h1>
-                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
-                    <?php
-                        if (isSourceIdUsed(5)) : ?>
-                            <p><a role="checkbox" <?php echo $time == 10 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(10);" data-group="time-checkbox" class="toggle-checkbox">  <i class="far <?php echo $time == 10 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;10 minutes</a></p>
-                        <? else : ?>
-                            <p><a role="checkbox" <?php echo $time == 10 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(10);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 10 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;10 minutes</a></p>
-                    <?php endif; ?>
-
-                    <p><a role="checkbox" <?php echo $time == 30 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(30);" data-group="time-checkbox" class="toggle-checkbox "><i class="far <?php echo $time == 30 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;30 minutes</a></p>
-
-                    <?php if (isSourceIdUsed(5)) : ?>
-                    <p><a role="checkbox" <?php echo $time == 60 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(60);"  data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 60 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;1 hour</a></p>
-                    <?php else : ?>
-                    <p><a role="checkbox" <?php echo $time == 60 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(60);" data-group="time-checkbox" class="toggle-checkbox" ><i class="far <?php echo $time == 60 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;1 hour</a></p>
-                    <?php endif; ?>
-
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 *  3);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 180 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;3 hours</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 *  6);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 360 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;6 hours</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 12);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;12 hours</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 24);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;1 day</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 48);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;2 days</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 72);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;3 days</a></p>
-                </div>
-
-                <div class="sidebar-pane" id="sb-map-type">
-                    <h1 class="sidebar-header">Map Options</h1>
-                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setMapType('roadmap');" data-group="map-type-checkbox" class="toggle-checkbox"><i class="far <?php echo $mapType == "roadmap" ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Roadmap</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setMapType('terrain');" data-group="map-type-checkbox" class="toggle-checkbox"><i class="far <?php echo $mapType == "terrain" ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Terrain / Outdoors</a></p>
-                    <?php if (getWebsiteConfig('leaflet_raster_tile_satellite') != null) : ?>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setMapType('satellite');" data-group="map-type-checkbox" class="toggle-checkbox"><i class="far <?php echo $mapType == "satellite" ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Satellite</a></p>
-                    <?php endif; ?> 
-                </div>
-                <div class="sidebar-pane" id="sb-show-hide">
-                    <h1 class="sidebar-header">Show / Hide Items on Map</h1>
-                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
-                    <?php if (isSourceIdUsed(1)) : ?>
-                        <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, false);" class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$phg]; ?>"></i></i>&nbsp;&nbsp;PHG Circles</a></p>
-                        <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, true);"  class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$rng]; ?>"></i></i>&nbsp;&nbsp;Range Circles</a></p>
-                    <?php endif; ?>
-                </div>
-                <div class="sidebar-pane" id="sb-settings">
-                    <h1 class="sidebar-header">Settings</h1>
-                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setGrayscaleMode();" class="toggle-checkbox"><i class="far <?php echo $grayscale == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Grayscale Map</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="toggleImperialUnits();" class="toggle-checkbox"><i class="far <?php echo $imperialunits == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Imperial Units</a></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="topnav" id="tdTopnav" style="display: none !important; height=0px !important;">
-            <!-- <a  style="color: white; padding: 7px 10px 8px 10px;"
+        <div class="topnav" id="tdTopnav">
+            <a  style="color: white; padding: 7px 10px 8px 10px;"
                 href=""
                 onclick="
                     if (location.protocol != 'https:') {
@@ -402,7 +270,7 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                     <a href="javascript:void(0);" onclick="trackdirect.setTimeLength(4320); $('#tdTopnavTimelength>a').removeClass('dropdown-content-checkbox-active'); $(this).addClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden">72 hours</a>
 
                 </div>
-            </div> -->
+            </div>
 
             <?php if (getWebsiteConfig('google_key') != null ||  getWebsiteConfig('maptiler_key') != null) : ?>
             <div class="dropdown">
@@ -457,7 +325,7 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                     <a href="javascript:void(0);" onclick="trackdirect.toggleOgflymPositions(); $(this).toggleClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox" title="Hide model airplanes (OGFLYM)">Hide model airplanes (OGFLYM)</a>
                     <a href="javascript:void(0);" onclick="trackdirect.toggleUnknownPositions(); $(this).toggleClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox" title="Hide unknown aircrafts">Hide unknown aircrafts</a>
                     <?php endif; ?>
-                    <a href="javascript:void(0);" onclick="setGrayscaleMode(); $(this).toggleClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $grayscale == 1 ? "dropdown-content-checkbox-active":"" ?>" title="Grayscale Map" >Grayscale Map</a>
+                    <a href="javascript:void(0);" onclick="setGrayscaleMode(); $(this).toggleClass('dropdown-content-checkbox-active');" class="dropdown-content-checkbox <?php echo $safe_GET['grayscale'] == 1 ? "dropdown-content-checkbox-active":"" ?>" title="Grayscale Map" >Grayscale Map</a>
                 </div>
             </div>
 
@@ -507,7 +375,7 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
             <a href="javascript:void(0);" class="icon" onclick="toggleTopNav()">&#9776;</a>
         </div>
 
-        <div id="map-container" class="sidebar-map"></div>
+        <div id="map-container"></div>
 
         <!-- <div id="right-container">
             <div id="right-container-info">
