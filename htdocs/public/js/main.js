@@ -51,13 +51,20 @@ function loadView(url) {
         $("#td-modal-title").text(title);
 
         $("#td-modal-content .tdlink").unbind('click').bind('click', function(e) {
-          loadView(this.href);
+          let windowUrl = new URL(window.location);
+          let hrefUrl = new URL(this.href);
+          for (const [key, value] of windowUrl.searchParams.entries()) {
+            if (!hrefUrl.searchParams.has(key))
+              hrefUrl.searchParams.set(key, value); 
+          }
+          loadView(hrefUrl.toString().replace("%2C", ","));
           e.preventDefault();
         });
       }
     );
   }
 }
+
 jQuery(document).ready(function ($) {
   $(".tdlink").bind('click', function(e) {
     loadView(this.href);
@@ -136,6 +143,20 @@ jQuery(document).ready(function ($) {
   });
 });
 
+// handle search field
+jQuery(document).ready(function ($) {
+  $('#station-search').keypress(function (e) {
+    if (e.which == 13) {
+        var q = $('#station-search').val();
+        let url = new URL(window.location);
+        url.pathname = "/views/search.php";
+        url.searchParams.set("q", q);
+        url.searchParams.set("seconds", 0);
+        loadView(url.toString().replace("%2C", ","));
+        window.sidebar.close();
+    }
+  });
+});
 
 function setMapType(value) {
     trackdirect.setMapType(value)

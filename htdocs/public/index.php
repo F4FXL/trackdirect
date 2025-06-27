@@ -235,13 +235,6 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                     } else {
                         alert('This service require HTML 5 features to be able to feed you APRS data in real-time. Please upgrade your browser.');
                     }
-
-                    $('#station-search').keypress(function (e) {
-                        if (e.which == 13) {
-                            var q = $('#station-search').val();
-                            loadView('/views/search.php?imperialUnits=<?php echo $safe_GET['imperialUnits'] ?? '0'; ?>&q=' + q + '&seconds=0');
-                        }
-                    });
                 });
             });
         </script>
@@ -283,6 +276,7 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                     <li><a href="#sb-tail-length" role="tab" title="Select history duration shown on map"><i class="fas fa-clock"></i></a></li>
                     <li><a href="#sb-map-type" role="tab" title="Switch between map types"><i class="fas fa-map"></i></a></li>
                     <li><a href="#sb-show-hide" role="tab" title="Show hide items on the map"><i class="far fa-eye"></i></a>
+                    <li><a href="#sb-search" role="tab" title="Search for a station"><i class="fas fa-search"></i></a>
                 </ul>
 
                 <ul role="tablist">
@@ -338,6 +332,11 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                         <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, false);" class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$phg]; ?>"></i></i>&nbsp;&nbsp;PHG Circles</a></p>
                         <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, true);"  class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$rng]; ?>"></i></i>&nbsp;&nbsp;Range Circles</a></p>
                     <?php endif; ?>
+                </div>
+                <div class="sidebar-pane" id="sb-search">
+                    <h1 class="sidebar-header">Search for Stations</h1>
+                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
+                    <p>Type a station name and hit enter&nbsp;&nbsp;<input type="text" id="station-search" placeholder="Search..."></p>
                 </div>
                 <div class="sidebar-pane" id="sb-settings">
                     <h1 class="sidebar-header">Settings</h1>
@@ -502,7 +501,7 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                 </div>
             </div>
 
-            <input type="text" id="station-search" placeholder="Search..">
+            <!-- <input type="text" id="station-search" placeholder="Search.."> -->
 
             <a href="javascript:void(0);" class="icon" onclick="toggleTopNav()">&#9776;</a>
         </div>
