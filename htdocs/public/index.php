@@ -202,7 +202,7 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                             window.sidebar = L.control.sidebar('sidebar', sidebarOptions).addTo(map);
                         });
 
-                        //handle grayscale
+                        // handle grayscale, PHG, RNG
                         trackdirect.addListener("map-created", function() {
                             //set grayscale once leaflet has been loaded
                             setGrayscaleMode(<?php echo $grayscale ?>);
