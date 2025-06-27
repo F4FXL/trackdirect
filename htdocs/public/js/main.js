@@ -37,31 +37,44 @@ jQuery(document).ready(function ($) {
 });
 
 // Open all internal url's in dialog
-function loadView(url) {
-  var view = url.split('/').pop().split("?")[0];
-  if (view != '') {
-    var requestUrl = '/views/' + url.split('/').pop();
+function loadView(urlStr) {
+  let url = new URL(urlStr);
+  let isViewUrl = url.pathname.includes('/views/');
+
+  let windowUrl = new URL(window.location);
+  let oldParams = window.viewParams ?? [];
+  //delete any url params from old view
+  for(p of oldParams) {
+    windowUrl.searchParams.delete(p);
+  }
+
+  // add requested params
+  for([key, val] of windowUrl.searchParams.entries()) {
+    if(!url.searchParams.has(key))
+      url.searchParams.set(key, val);
+  }
+
+  console.log("url: " + url);
+
+  if(isViewUrl) {
     $("#td-modal-content").html('<img src="/images/spinner.gif" style="max-width: 100%; max-height: 100px; margin-top: 40px; margin-left: auto; margin-right: auto; display: block;"/>');
     $("#td-modal-title").text('');
     $("#td-modal").show();
-    $("#td-modal-content").load(requestUrl, {'modal': true},
+    $("#td-modal-content").load(url.toString(), {'modal': true},
       function() {
-        history.replaceState(null, "", requestUrl);
+        history.replaceState(null, "", url.toString().replace("%2C", ","));
         var title = $('#td-modal-content title').text();
         $("#td-modal-title").text(title);
 
         $("#td-modal-content .tdlink").unbind('click').bind('click', function(e) {
-          let windowUrl = new URL(window.location);
-          let hrefUrl = new URL(this.href);
-          for (const [key, value] of windowUrl.searchParams.entries()) {
-            if (!hrefUrl.searchParams.has(key))
-              hrefUrl.searchParams.set(key, value); 
-          }
-          loadView(hrefUrl.toString().replace("%2C", ","));
+          loadView(this.href);
           e.preventDefault();
         });
       }
     );
+  }
+  else {
+    history.replaceState(null, "", url.toString().replace("%2C", ","));
   }
 }
 
@@ -71,6 +84,7 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
   });
 });
+
 
 // Handle dialog close
 jQuery(document).ready(function ($) {
