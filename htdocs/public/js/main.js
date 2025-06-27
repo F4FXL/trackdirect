@@ -62,7 +62,7 @@ function loadView(urlStr) {
     $("#td-modal").show();
     $("#td-modal-content").load(url.toString(), {'modal': true},
       function() {
-        history.replaceState(null, "", url.toString().replace("%2C", ","));
+        history.replaceState(null, "", url.toString().replaceAll("%2C", ","));
         var title = $('#td-modal-content title').text();
         $("#td-modal-title").text(title);
 
@@ -74,7 +74,7 @@ function loadView(urlStr) {
     );
   }
   else {
-    history.replaceState(null, "", url.toString().replace("%2C", ","));
+    history.replaceState(null, "", url.toString().replaceAll("%2C", ","));
   }
 }
 
@@ -97,7 +97,7 @@ jQuery(document).ready(function ($) {
       url.searchParams.delete(p);
     }
 
-    history.replaceState(null, "", url.toString().replace("%2C", ","));
+    history.replaceState(null, "", url.toString().replaceAll("%2C", ","));
   });
 });
 
@@ -107,7 +107,7 @@ jQuery(document).ready(function ($) {
     let url = new URL(window.location);
     url.searchParams.set("id", data.station_id);
     url.pathname = "/views/overview.php";
-    loadView(url.toString().replace("%2C", ","));
+    loadView(url.toString().replaceAll("%2C", ","));
   });
 });
 
@@ -124,7 +124,7 @@ jQuery(document).ready(function ($) {
         url.searchParams.set('center',  + newLat + "," + newLng);
         url.searchParams.set('zoom', newZoom);
 
-        window.history.replaceState({}, '', url.toString().replace("%2C", ","));//dirty hack to ensure we have , instead of %2C in the URL
+        window.history.replaceState({}, '', url.toString().replaceAll("%2C", ","));//dirty hack to ensure we have , instead of %2C in the URL
     }
   });
 });
@@ -170,7 +170,7 @@ jQuery(document).ready(function ($) {
         url.pathname = "/views/search.php";
         url.searchParams.set("q", q);
         url.searchParams.set("seconds", 0);
-        loadView(url.toString().replace("%2C", ","));
+        loadView(url.toString().replaceAll("%2C", ","));
         window.sidebar.close();
     }
   });

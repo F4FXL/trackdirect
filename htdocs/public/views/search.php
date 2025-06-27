@@ -129,7 +129,7 @@
             for (const [key, value] of formData.entries()) {
                 url.searchParams.set(key, value);
             }
-	        loadView(url.toString().replace("%2C", ","));
+	        loadView(url.toString().replaceAll("%2C", ","));
 
         });
 
