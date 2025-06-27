@@ -87,7 +87,7 @@
                         </td>
                         <td>
                             <?php if ($foundStation->latestConfirmedPacketTimestamp > (time() - 60*60*24)) : ?>
-                                <a href="?sid=<?php echo $foundStation->id; ?>" onclick="
+                                <a class="tdlink" href="/?sid=<?php echo $foundStation->id; ?>" onclick="
                                     if (window.parent && window.parent.trackdirect) {
                                         $('.modal', parent.document).hide();
                                         window.parent.trackdirect.filterOnStationId([]);
