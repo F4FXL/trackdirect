@@ -132,5 +132,7 @@
 	        loadView(url.toString().replace("%2C", ","));
 
         });
+
+        window.viewParams = ["q", "seconds"];
     });
 </script>

@@ -78,7 +78,11 @@ jQuery(document).ready(function ($) {
     $('#td-modal').hide();
     let url = new URL(window.location);
     url.pathname = ""; //we are closing a view, clear the path
-    url.searchParams.delete("id"); //cleanup id, if any
+
+    for(p of window.viewParams) { //clean up view specific url parameters
+      url.searchParams.delete(p);
+    }
+
     history.replaceState(null, "", url.toString().replace("%2C", ","));
   });
 });
