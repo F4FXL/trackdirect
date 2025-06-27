@@ -336,7 +336,7 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                 <div class="sidebar-pane" id="sb-search">
                     <h1 class="sidebar-header">Search for Stations</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
-                    <p>Type a station name and hit enter&nbsp;&nbsp;<input type="text" id="station-search" placeholder="Search..."></p>
+                    <p>Type a station name and hit enter&nbsp;&nbsp;</p><p><input type="text" id="station-search" placeholder="Search..."></p>
                 </div>
                 <div class="sidebar-pane" id="sb-settings">
                     <h1 class="sidebar-header">Settings</h1>
