@@ -132,7 +132,10 @@ jQuery(document).ready(function ($) {
 // Handle filter response
 jQuery(document).ready(function ($) {
   trackdirect.addListener("filter-changed", function (packets) {
+    let url = new URL(window.location);
     if (packets.length == 0) {
+      url.searchParams.delete('snamelist');
+      url.searchParams.delete('sid');
       // We are not filtering any more.
       $("#right-container-filtered").hide();
 
@@ -145,19 +148,26 @@ jQuery(document).ready(function ($) {
       
     } else {
       var counts = {};
+      
       for (var i = 0; i < packets.length; i++) {
         // Note that if related is set to 1, it is included since it is related to the station we are filtering on
         if (packets[i].related == 0) {
-          counts[packets[i]["station_name"]] =
-            1 + (counts[packets[i]["station_name"]] || 0);
+          counts[packets[i]["station_name"]] = 1 + (counts[packets[i]["station_name"]] || 0);
         }
       }
+
+      let snamelist = Object.keys(counts).join(",");
+      url.searchParams.set('snamelist', snamelist);
+      url.searchParams.delete('sid'); // use names, more userfriendly than ids.
+
       $("#right-container-filtered-content").html(
         "Filtering on " + Object.keys(counts).length + " station(s)"
       );
       $("#right-container-filtered").show();
       $(".dropdown-content-checkbox-only-filtering").removeClass("dropdown-content-checkbox-hidden");
     }
+
+    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ","));
   });
 });
 
