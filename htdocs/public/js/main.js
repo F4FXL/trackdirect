@@ -88,7 +88,6 @@ jQuery(document).ready(function ($) {
 
 // Update url when user moves map
 jQuery(document).ready(function ($) {
-  var newUrlTimeoutId = null;
   trackdirect.addListener("position-request-sent", function (data) {
       if ($("#td-modal").is(":hidden")) {
         let url = new URL(window.location);
