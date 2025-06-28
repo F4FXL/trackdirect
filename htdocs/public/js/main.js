@@ -144,8 +144,7 @@ jQuery(document).ready(function ($) {
 
       // Reset tail length to default when filtering is stopped
       $(".dropdown-content-checkbox-only-filtering").addClass("dropdown-content-checkbox-hidden");
-      toggleCheckBox(document.getElementById('tdTopnavTimelengthDefault'));
-      
+      toggleCheckBoxSquare(document.getElementById('tdTopnavTimelengthDefault'));
     } else {
       var counts = {};
       
@@ -248,6 +247,14 @@ jQuery(document).ready(function ($) {
     });
   });
 });
+
+function toggleCheckBoxSquare(anchor) {
+  toggleCheckBox(anchor, '.toggle-checkbox', 'fa-square', 'fa-check-square');
+}
+
+function toggleCheckBoxEye(anchor) {
+  toggleCheckBox(anchor, '.toggle-checkbox-eye', 'fa-eye', 'fa-eye-slash');
+}
 
 function toggleCheckBox(anchor, cls, unchecked, checked) {
   const icon = anchor.querySelector('i');
