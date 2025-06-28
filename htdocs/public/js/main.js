@@ -83,6 +83,10 @@ jQuery(document).ready(function ($) {
     loadView(this.href);
     e.preventDefault();
   });
+  $(".tdlink-sb").bind('click', function(e) {
+    window.sidebar.close();
+    e.preventDefault();
+  });
 });
 
 
