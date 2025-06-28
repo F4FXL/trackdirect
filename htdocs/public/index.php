@@ -106,7 +106,7 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
 
                 // Tell jslib which html element to use to show connection status and mouse coordinates
                 options['statusContainerElementId'] = 'status-container';
-                options['coordinatesContainerElementId'] = 'cordinates-container';
+                options['coordinatesContainerElementId'] = 'coordinate-container';
 
                 <?php if (isSourceIdUsed(5)) : ?>
                     // Adapt settings for OGN data
@@ -546,22 +546,6 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
             </div>
         </div> -->
 
-       <div id="right-container">
-            <div id="right-container-info">
-                <div id="status-container"></div>
-                <div id="cordinates-container"></div>
-            </div>
-
-            <div id="right-container-filtered">
-                <div id="right-container-filtered-content"></div>
-                <a href="#" onclick="trackdirect.filterOnStationId([]); return false;">reset</a>
-            </div>
-
-            <div id="right-container-timetravel">
-                <div id="right-container-timetravel-content"></div>
-                <a href="#" onclick="trackdirect.setTimeTravelTimestamp(0); $('#right-container-timetravel').hide(); return false;">reset</a>
-            </div>
-        </div>
 
         <div id="td-modal" class="modal">
             <div class="modal-long-content">
@@ -659,16 +643,9 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
             </div>
         </div>
 
-        <!-- <div id="bottominfo-container">
-            <div style="margin-left: 10px; width: 350px;">
-                <span id="status-container"></span>
-            </div>
-            <div style="width: 350px;">
-                <span id="maintainer-container">Maintained by <a href="mailto:<?php echo getWebsiteConfig('owner_email'); ?>"><?php echo getWebsiteConfig('owner_name'); ?></a>, based on <a target="_blank" href="https://www.aprsdirect.com">APRS Track Direct</a></span>
-            </div>
-            <div style="margin-right:10px; width: 350px; text-align:right;">
-                <span id="coordinate-container"></span>
-            </div>
-        </div> -->
+        <div id="bottominfo-container">
+            <div id="coordinate-container"></div>
+            <div id="status-container"></div>
+        </div>
     </body>
 </html>
