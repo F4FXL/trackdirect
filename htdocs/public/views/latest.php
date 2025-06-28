@@ -99,5 +99,6 @@
                 $(this).html(moment(new Date(1000 * $(this).html())).format('L LTSZ'));
             }
         });
+        window.viewParams = ["q", "seconds", "page"];
     });
 </script>

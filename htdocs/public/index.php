@@ -277,9 +277,11 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                     <li><a href="#sb-map-type" role="tab" title="Switch between map types"><i class="fas fa-map"></i></a></li>
                     <li><a href="#sb-show-hide" role="tab" title="Show hide items on the map"><i class="far fa-eye"></i></a>
                     <li><a href="#sb-search" role="tab" title="Search for a station"><i class="fas fa-search"></i></a>
+                    <li><a href="#sb-other" role="tab" title="Other"><i class="fas fa-ellipsis-h"></i></a>
                 </ul>
 
                 <ul role="tablist">
+                    <li><a href="/views/about.php" role="tab" class="tdlink"><i class="far fa-question-circle"></i></a></li>
                     <li><a href="#sb-settings" role="tab"><i class="fa fa-cog"></i></a></li>
                 </ul>
             </div>
@@ -337,6 +339,11 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
                     <h1 class="sidebar-header">Search for Stations</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
                     <p>Type a station name and hit enter&nbsp;&nbsp;</p><p><input type="text" id="station-search" placeholder="Search..."></p>
+                </div>
+                <div class="sidebar-pane" id="sb-other">
+                    <h1 class="sidebar-header">Other</h1>
+                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
+                    <p><a href="/views/latest.php" class="tdlink tdlink-sb" title="Show all received packets live"><i class="fas fa-broadcast-tower"></i></i>&nbsp;&nbsp;Latest Packets</a><p>
                 </div>
                 <div class="sidebar-pane" id="sb-settings">
                     <h1 class="sidebar-header">Settings</h1>
