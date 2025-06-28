@@ -773,6 +773,15 @@ var trackdirect = {
     this._map.showHideMarkers();
   },
 
+  getStationaryPositionsState : function() {
+    return this._map.state.isStationaryMarkersVisible;
+  },
+
+  setStationaryPositionsState : function(state) {
+    this._map.state.isStationaryMarkersVisible = state;
+    this._map.showHideMarkers();
+  },
+
   /**
    * Toggle Unknown positions
    * @return None
