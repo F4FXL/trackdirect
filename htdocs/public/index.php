@@ -8,6 +8,7 @@ $phg = in_array((int)$safe_GET['phg'], [0, 1, 2]) ? (int)$safe_GET['phg'] : 0;
 $rng = in_array((int)$safe_GET['rng'], [0, 1, 2]) ? (int)$safe_GET['rng'] : 0;
 $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapapi'] : 'leaflet';
 $hidenotmoving = $safe_GET['hidenotmoving'] == 1 ? 1 : 0;
+$hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
 ?>
 
 <!DOCTYPE html>
@@ -214,6 +215,8 @@ $hidenotmoving = $safe_GET['hidenotmoving'] == 1 ? 1 : 0;
                             trackdirect.setRNGCirclesState(<?php echo $rng; ?>);
                             // set stationary from URL
                             trackdirect.setStationaryPositionsState(<?php echo $hidenotmoving == 1? 'false' : 'true'?>);
+                            // set internet from URL
+                            trackdirect.setInternetPositionsState(<?php echo $hideinternet == 1? 'false' : 'true'?>);
                         });
 
                     <?php endif; ?>
@@ -338,6 +341,9 @@ $hidenotmoving = $safe_GET['hidenotmoving'] == 1 ? 1 : 0;
                         <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, false);" class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$phg]; ?>"></i></i>&nbsp;&nbsp;PHG Circles</a></p>
                         <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, true);"  class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$rng]; ?>"></i></i>&nbsp;&nbsp;Range Circles</a></p>
                         <p><a role="checkbox" href="javascript:void(0);" onclick="toggleStationaryStations();"  class="toggle-checkbox-eye"><i class="far <?php echo $hidenotmoving == 0 ? "fa-eye" : "fa-eye-slash"; ?>"></i></i>&nbsp;&nbsp;Not moving stations</a></p>
+                        <?php if (isSourceIdUsed(1)) : ?>
+                        <p><a role="checkbox" href="javascript:void(0);" onclick="toggleInternetStations();"  class="toggle-checkbox-eye"><i class="far <?php echo $hideinternet == 0 ? "fa-eye" : "fa-eye-slash"; ?>"></i></i>&nbsp;&nbsp;Internet stations</a></p>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
                 <div class="sidebar-pane" id="sb-search">

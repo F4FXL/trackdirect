@@ -821,6 +821,15 @@ var trackdirect = {
     this._map.showHideMarkers();
   },
 
+  getInternetPositionsState: function () {
+    return this._map.state.isInternetMarkersVisible;
+  },
+
+  setInternetPositionsState: function (state) {
+    this._map.state.isInternetMarkersVisible = state;
+    this._map.showHideMarkers();
+  },
+
   /**
    * Toggle the CWOP positions option
    * @return None

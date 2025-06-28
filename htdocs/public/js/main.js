@@ -350,11 +350,25 @@ function toggleStationaryStations()
 {
   trackdirect.toggleStationaryPositions();
   let url = new URL(window.location);
-  if(trackdirect.getStationaryPositionsState()) {
+  if(!trackdirect.getStationaryPositionsState()) {
     url.searchParams.set('hidenotmoving', 1);
   }
   else {
     url.searchParams.delete('hidenotmoving');
+  }
+
+  window.history.replaceState({}, '', url);
+}
+
+function toggleInternetStations()
+{
+  trackdirect.toggleInternetPositions();
+  let url = new URL(window.location);
+  if(!trackdirect.getInternetPositionsState()) {
+    url.searchParams.set('hideinternet', 1);
+  }
+  else {
+    url.searchParams.delete('hideinternet');
   }
 
   window.history.replaceState({}, '', url);
