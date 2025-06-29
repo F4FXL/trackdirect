@@ -970,13 +970,17 @@ var trackdirect = {
       this._map.state.filterStationIds.length > 0 &&
       this._map.state.filterStationIds.indexOf(stationId) > -1
     ) {
+      console.log("Stop filter " + stationId);
       // We want to stop filtering
       this.stopFilterOnStationId(stationId);
       if (filterLinkElementClass !== null) {
         $("." + filterLinkElementClass).html("Filter");
       }
     } else {
-      this.filterOnStationId(stationId);
+      console.log("Start filter " + stationId);
+      let ids = this._map.state.filterStationIds.slice();
+      ids.push(stationId);
+      this.filterOnStationId(ids);
       if (filterLinkElementClass !== null) {
         $("." + filterLinkElementClass).html("Unfilter");
       }
