@@ -119,6 +119,8 @@ jQuery(document).ready(function ($) {
     let url = new URL(window.location);
     if(timestamp <= 0) {
       $('#right-container-timetravel').hide();
+      $('#timetravel-date').val('0');
+      $('#timetravel-time').val('0');
     }
     else {
       let datetime = moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm');
@@ -244,7 +246,7 @@ function setGrayscaleMode(enabled) {
     var isGray = document.querySelector('.grayscale-tiles') !== null;
     enabled = !isGray;
   }
-  
+
   allTileContainers.forEach(function(container) {
       if (enabled) {
           container.classList.remove('grayscale-tiles-dummy');
