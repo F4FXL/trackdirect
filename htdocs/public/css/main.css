@@ -387,12 +387,14 @@ input[type=submit]:hover {
 #right-container {
   position: absolute;
   right: 0px;
+  top: 0px;
   text-align: right;
 }
 
 #right-container-info, #right-container-filtered, #right-container-timetravel {
   position:relative;
   right:10px;
+  top: 10px;
   z-index:50;
 
   color: #4d4d4d;

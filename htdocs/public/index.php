@@ -528,13 +528,13 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
 
         <div id="map-container" class="sidebar-map"></div>
 
-        <!-- <div id="right-container">
-            <div id="right-container-info">
+        <div id="right-container">
+            <!-- <div id="right-container-info">
                 <div  id="status-container"></div>
-            </div>
-            <div id="coordinate-container">
+            </div> -->
+            <!-- <div id="coordinate-container">
                 <span  id="coordinate-container-content"></span>
-            </div>
+            </div> -->
             <div id="right-container-filtered">
                 <span id="right-container-filtered-content"></span>
                 <a href="#" onclick="trackdirect.filterOnStationId([]); return false;">reset</a>
@@ -544,7 +544,7 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                 <span id="right-container-timetravel-content"></span>
                 <a href="#" onclick="trackdirect.setTimeTravelTimestamp(0); $('#right-container-timetravel').hide(); return false;">reset</a>
             </div>
-        </div> -->
+        </div>
 
 
         <div id="td-modal" class="modal">
