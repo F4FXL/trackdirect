@@ -1556,24 +1556,38 @@ trackdirect.models.Map.prototype._getGpsDegreeFromGpsDecimal = function (
 /**
  * Convert decimal gps position to maidenhead locator
  * @param {float} lat
- * @param {float} lng
+ * @param {float} lon
  * @return {string}
  */
 trackdirect.models.Map.prototype._getMaidenheadLocatorFromGpsDecimal = function (
   lat,
-  lng,
+  lon,
 ) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVX';
-  let result = '';
-  lng = lng + 180;
-  lat = lat + 90;
-  result = chars.charAt(parseInt(lng / 20));
-  result += chars.charAt(parseInt(lat / 10));
-  result += parseInt(lng / 2 % 10);
-  result += parseInt(lat % 10);
-  lng_r = (lng - parseInt(lng / 2) * 2) * 60;
-  lat_r = (lat - parseInt(lat)) * 60;
-  result += chars.charAt(parseInt(lng_r / 5));
-  result += chars.charAt(parseInt(lat_r / 2.5));
-  return result;
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+    // Décalage
+    lon += 180;
+    lat += 90;
+
+    // Champs (Field)
+    var A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var fieldLon = Math.floor(lon / 20);
+    var fieldLat = Math.floor(lat / 10);
+
+    // Carrés (Square)
+    var squareLon = Math.floor((lon % 20) / 2);
+    var squareLat = Math.floor((lat % 10) / 1);
+
+    // Sous-carrés (Subsquare)
+    // ATTENTION : ici, il faut vraiment conserver toute la décimale pour bien tomber dans le bon carré !
+    var subsquareLon = Math.floor(((lon % 2) / 2) * 24);
+    var subsquareLat = Math.floor(((lat % 1) / 1) * 24);
+
+    return (
+        A.charAt(fieldLon) +
+        A.charAt(fieldLat) +
+        squareLon.toString() +
+        squareLat.toString() +
+        A.charAt(subsquareLon) +
+        A.charAt(subsquareLat)
+    );
 };
