@@ -186,7 +186,7 @@ jQuery(document).ready(function ($) {
 
       // Reset tail length to default when filtering is stopped
       $(".dropdown-content-checkbox-only-filtering").addClass("dropdown-content-checkbox-hidden");
-      toggleCheckBoxSquare(document.getElementById('tdTopnavTimelengthDefault'));
+      if(trackdirect.getTimeLength() > 360) trackdirect.setTimeLength(60);
     } else {
       var counts = {};
       

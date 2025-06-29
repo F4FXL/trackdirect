@@ -704,6 +704,10 @@ var trackdirect = {
     this._updateMinZoomLevels();
   },
 
+  getTimeLength: function () {
+    return this._map.state.getTimeLength();
+  },
+
   /**
    * Toggle PHG circles
    * @return None
