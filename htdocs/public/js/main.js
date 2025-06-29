@@ -54,15 +54,13 @@ function loadView(urlStr) {
       url.searchParams.set(key, val);
   }
 
-  console.log("url: " + url);
-
   if(isViewUrl) {
     $("#td-modal-content").html('<img src="/images/spinner.gif" style="max-width: 100%; max-height: 100px; margin-top: 40px; margin-left: auto; margin-right: auto; display: block;"/>');
     $("#td-modal-title").text('');
     $("#td-modal").show();
     $("#td-modal-content").load(url.toString(), {'modal': true},
       function() {
-        history.replaceState(null, "", url.toString().replaceAll("%2C", ","));
+        history.replaceState(null, "", url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
         var title = $('#td-modal-content title').text();
         $("#td-modal-title").text(title);
 
@@ -74,7 +72,7 @@ function loadView(urlStr) {
     );
   }
   else {
-    history.replaceState(null, "", url.toString().replaceAll("%2C", ","));
+    history.replaceState(null, "", url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
   }
 }
 
@@ -101,7 +99,7 @@ jQuery(document).ready(function ($) {
       url.searchParams.delete(p);
     }
 
-    history.replaceState(null, "", url.toString().replaceAll("%2C", ","));
+    history.replaceState(null, "", url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
   });
 });
 
@@ -111,7 +109,44 @@ jQuery(document).ready(function ($) {
     let url = new URL(window.location);
     url.searchParams.set("id", data.station_id);
     url.pathname = "/views/overview.php";
-    loadView(url.toString().replaceAll("%2C", ","));
+    loadView(url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
+  });
+});
+
+//handle time travel changed
+jQuery(document).ready(function ($) {
+  trackdirect.addListener("time-travel-changed", function (timestamp) {
+    let url = new URL(window.location);
+    if(timestamp <= 0) {
+      $('#right-container-timetravel').hide();
+    }
+    else {
+      let datetime = moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm');
+      $('#right-container-timetravel-content').html('Time travel to ' + datetime);
+      $('#right-container-timetravel').show();
+
+      url.searchParams.set('timetravel', datetime);
+    }
+    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
+  });
+});
+
+//handle time length changed
+jQuery(document).ready(function ($) {
+  trackdirect.addListener("time-length-changed", function (timelength) {
+    let elementId = "time-" + timelength;
+    let anchor = document.getElementById(elementId);
+
+    if(anchor === undefined) {
+      trackdirect.setTimeLength(60);
+      return;
+    }
+
+    toggleCheckBoxSquare(anchor);
+
+    var url = new URL(window.location);
+    url.searchParams.set('time', timelength);
+    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
   });
 });
 
@@ -128,7 +163,7 @@ jQuery(document).ready(function ($) {
         url.searchParams.set('center',  + newLat + "," + newLng);
         url.searchParams.set('zoom', newZoom);
 
-        window.history.replaceState({}, '', url.toString().replaceAll("%2C", ","));//dirty hack to ensure we have , instead of %2C in the URL
+        window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));//dirty hack to ensure we have , instead of %2C in the URL
     }
   });
 });
@@ -170,7 +205,7 @@ jQuery(document).ready(function ($) {
       $(".dropdown-content-checkbox-only-filtering").removeClass("dropdown-content-checkbox-hidden");
     }
 
-    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ","));
+    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
   });
 });
 
@@ -183,7 +218,7 @@ jQuery(document).ready(function ($) {
         url.pathname = "/views/search.php";
         url.searchParams.set("q", q);
         url.searchParams.set("seconds", 0);
-        loadView(url.toString().replaceAll("%2C", ","));
+        loadView(url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
         window.sidebar.close();
     }
   });
@@ -276,12 +311,12 @@ function toggleCheckBox(anchor, cls, unchecked, checked) {
   }
 }
 
-function setTimeLength(time)
+function setTimeLength(time, sendtoServer = true)
 {
-  trackdirect.setTimeLength(time);
-  var url = new URL(window.location);
-  url.searchParams.set('time', time);
-  window.history.replaceState({}, '', url);
+  // trackdirect.setTimeLength(time, sendtoServer);
+  // var url = new URL(window.location);
+  // url.searchParams.set('time', time);
+  // window.history.replaceState({}, '', url);
 }
 
 function toggleImperialUnits()

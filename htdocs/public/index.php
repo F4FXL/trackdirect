@@ -9,6 +9,7 @@ $rng = in_array((int)$safe_GET['rng'], [0, 1, 2]) ? (int)$safe_GET['rng'] : 0;
 $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapapi'] : 'leaflet';
 $hidenotmoving = $safe_GET['hidenotmoving'] == 1 ? 1 : 0;
 $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
+$timetravel = isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_to_save_position_data')) ? "moment('" . $safe_GET['timetravel'] . "', 'YYYY-MM-DD HH:mm').unix()" : "0";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,10 +90,10 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                     options['isMobile'] = true;
                 }
 
-                options['time'] =       "<?php echo $time ?>";        // How many minutes of history to show
+                options['time'] =       "<?php echo $time; ?>";        // How many minutes of history to show
                 options['center'] =     "<?php echo $safe_GET['center'] ?? '' ?>";      // Position to center on (for example "46.52108,14.63379")
                 options['zoom'] =       "<?php echo $safe_GET['zoom'] ?? '' ?>";        // Zoom level
-                options['timetravel'] = "<?php echo $safe_GET['timetravel'] ?? '' ?>";  // Unix timestamp to travel to
+                options['timetravel'] = <?php echo $timetravel?>;  // Unix timestamp to travel to
                 options['maptype'] =    "<?php echo $mapType ?>";     // May be "roadmap", "terrain" or "satellite"
                 options['mid'] =        "<?php echo $safe_GET['mid'] ?? '' ?>";         // Render map from "Google My Maps" (requires https)
                 options['useImperialUnit'] = <?php echo $imperialunits == 1 ? 1:0 ?>;
@@ -177,8 +178,6 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
 					            '<br>&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 							}
 						}
-
-                        options['time'] = <?php echo $time ?>;
 
                         options['supportedMapTypes'] = {};
                         options['supportedMapTypes']['roadmap'] = "<?php echo getWebsiteConfig('leaflet_raster_tile_roadmap'); ?>";
@@ -305,25 +304,25 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                     <h2>Tail length</h2>
                     <?php
                         if (isSourceIdUsed(5)) : ?>
-                            <p><a role="checkbox" <?php echo $time == 10 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(10);" data-group="time-checkbox" class="toggle-checkbox">  <i class="far <?php echo $time == 10 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;10 minutes</a></p>
+                            <p><a id="time-10" role="checkbox" <?php echo $time == 10 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="trackdirect.setTimeLength(10);" data-group="time-checkbox" class="toggle-checkbox">  <i class="far <?php echo $time == 10 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;10 minutes</a></p>
                         <? else : ?>
-                            <p><a role="checkbox" <?php echo $time == 10 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(10);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 10 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;10 minutes</a></p>
+                            <p><a id="time-10" role="checkbox" <?php echo $time == 10 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="trackdirect.setTimeLength(10);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 10 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;10 minutes</a></p>
                     <?php endif; ?>
 
-                    <p><a role="checkbox" <?php echo $time == 30 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(30);" data-group="time-checkbox" class="toggle-checkbox "><i class="far <?php echo $time == 30 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;30 minutes</a></p>
+                    <p><a id="time-30" role="checkbox" <?php echo $time == 30 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="trackdirect.setTimeLength(30);" data-group="time-checkbox" class="toggle-checkbox "><i class="far <?php echo $time == 30 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;30 minutes</a></p>
 
                     <?php if (isSourceIdUsed(5)) : ?>
-                    <p><a role="checkbox" <?php echo $time == 60 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(60);"  data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 60 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;1 hour</a></p>
+                    <p><a id="time-60" role="checkbox" <?php echo $time == 60 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="trackdirect.setTimeLength(60);"  data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 60 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;1 hour</a></p>
                     <?php else : ?>
-                    <p><a role="checkbox" <?php echo $time == 60 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(60);" data-group="time-checkbox" class="toggle-checkbox" ><i class="far <?php echo $time == 60 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;1 hour</a></p>
-                    <?php endif; ?>
+                    <p><a id="time-60" role="checkbox" <?php echo $time == 60 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="trackdirect.setTimeLength(60);" data-group="time-checkbox" class="toggle-checkbox" ><i class="far <?php echo $time == 60 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;1 hour</a></p>
+                    <?php endif;?>
 
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 *  3);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 180 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;3 hours</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 *  6);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 360 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;6 hours</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 12);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;12 hours</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 24);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;1 day</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 48);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;2 days</a></p>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 72);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;3 days</a></p>
+                    <p><a id="time-180"  role="checkbox" href="javascript:void(0);" onclick="trackdirect.setTimeLength(60 *  3);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 180 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;3 hours</a></p>
+                    <p><a id="time-360"  role="checkbox" href="javascript:void(0);" onclick="trackdirect.setTimeLength(60 *  6);" data-group="time-checkbox" class="toggle-checkbox"><i class="far <?php echo $time == 360 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;6 hours</a></p>
+                    <p><a id="time-720"  role="checkbox" href="javascript:void(0);" onclick="trackdirect.setTimeLength(60 * 12);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;12 hours</a></p>
+                    <p><a id="time-1440" role="checkbox" href="javascript:void(0);" onclick="trackdirect.setTimeLength(60 * 24);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;1 day</a></p>
+                    <p><a id="time-2880" role="checkbox" href="javascript:void(0);" onclick="trackdirect.setTimeLength(60 * 48);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;2 days</a></p>
+                    <p><a id="time-4320" role="checkbox" href="javascript:void(0);" onclick="trackdirect.setTimeLength(60 * 72);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;3 days</a></p>
                     <h2>Time travel</h2>
                     <?php if (!isAllowedToShowOlderData()) : ?>
                         <div style="text-align: center;">
@@ -706,13 +705,9 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                                         trackdirect.setTimeLength(60, false);
                                         var ts = moment($('#timetravel-date').val() + ' ' + $('#timetravel-time').val(), 'YYYY-MM-DD HH:mm').unix();
                                         trackdirect.setTimeTravelTimestamp(ts);
-                                        $('#right-container-timetravel-content').html('Time travel to ' + $('#timetravel-date').val() + ' ' + $('#timetravel-time').val());
-                                        $('#right-container-timetravel').show();
                                     } else {
                                         trackdirect.setTimeTravelTimestamp(0, true);
-                                        $('#right-container-timetravel').hide();
                                     }
-                                    $('#modal-timetravel').hide();
                                     return false;"/>
                         </form>
                     <?php endif; ?>

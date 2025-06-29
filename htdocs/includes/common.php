@@ -1944,3 +1944,21 @@ function getLngFromLngPixelCoordinate($lngPixelCoord, $zoom, $imageTileSize) {
     return $lng;
 }
 
+function isValidDateInRange($dateStr, $days = 14) {
+    // Vérification du format avec regex (YYYY-MM-DD HH:mm)
+    if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $dateStr)) {
+        return false;
+    }
+    // Création d'un objet DateTime à partir de la chaîne
+    $date = DateTime::createFromFormat('Y-m-d H:i', $dateStr);
+    if (!$date) {
+        return false;
+    }
+    $errors = DateTime::getLastErrors();
+    if ($errors['warning_count'] > 0 || $errors['error_count'] > 0) {
+        return false;
+    }
+    $now = new DateTime();
+    $past = (new DateTime())->modify("-$days days");
+    return ($date >= $past && $date <= $now);
+}
