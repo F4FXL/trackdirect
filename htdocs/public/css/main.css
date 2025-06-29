@@ -356,14 +356,16 @@ input[type=submit]:hover {
 }
 
 /* Le container de coordonnées prend toute la place dispo à gauche, texte aligné à droite */
-#coordinates-container {
+#coordinate-container {
   flex: 1 1 0;
   color: #4d4d4d;
   white-space: nowrap;
   text-align: right;
   font-size: 12px;
   min-width: 80px;
+  font-family: "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
 }
+
 
 /* Le statut est à droite, texte à droite aussi */
 #status-container {
@@ -376,9 +378,9 @@ input[type=submit]:hover {
   min-width: 80px;
 }
 
-@media screen and (min-width: 800px) {
-  #cordinates-container {
-    display: block;
+@media screen and (max-width: 550px) {
+  #coordinate-container {
+    display: none !important;
   }
 }
 
