@@ -118,6 +118,7 @@ jQuery(document).ready(function ($) {
   trackdirect.addListener("time-travel-changed", function (timestamp) {
     let url = new URL(window.location);
     if(timestamp <= 0) {
+      url.searchParams.delete('timetravel');
       $('#right-container-timetravel').hide();
       $('#timetravel-date').val('0');
       $('#timetravel-time').val('0');
