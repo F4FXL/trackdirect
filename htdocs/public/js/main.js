@@ -205,17 +205,12 @@ function setGrayscaleMode(enabled) {
   var allTileContainers = document.querySelectorAll('.grayscale-tiles, .grayscale-tiles-dummy');
 
   if (enabled === undefined) {
-      // check if we have grayscale in url
-      let url = new URL(window.location);
-      if(url.searchParams.get('grayscale')) {
-        enabled = url.searchParams.get('grayscale') == '1';
-      }
-      else {
-        // Détecte l'état courant : s'il y a au moins un .grayscale-tiles, c'est en gris, sinon couleur
-        var isGray = document.querySelector('.grayscale-tiles') !== null;
-        enabled = !isGray;
-      }
+    // Détecte l'état courant : s'il y a au moins un .grayscale-tiles, c'est en gris, sinon couleur
+    var isGray = document.querySelector('.grayscale-tiles') !== null;
+    enabled = !isGray;
   }
+
+  console.log("Grayscale enabled " + enabled);
 
   allTileContainers.forEach(function(container) {
       if (enabled) {

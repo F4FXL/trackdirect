@@ -208,7 +208,7 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                         // handle grayscale, PHG, RNG
                         trackdirect.addListener("map-created", function() {
                             //set grayscale once leaflet has been loaded
-                            setGrayscaleMode(<?php echo $grayscale ?>);
+                            setGrayscaleMode(<?php echo $grayscale == 1 ? 'true' : 'false'; ?>);
                             // set PHG from URL
                             trackdirect.setPHGCirclesState(<?php echo $phg; ?>);
                             // set RNG from URL
