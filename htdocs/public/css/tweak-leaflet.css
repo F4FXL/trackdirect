@@ -66,9 +66,9 @@ img[src*="dotColor"] {
 }
 
 .grayscale-tiles img {
-    filter: grayscale(100%) opacity(70%);
+    filter: grayscale(100%) opacity(100%);
 }
 
 .grayscale-tiles-dummy img {
-  filter: grayscale(0%) opacity(70%);
+  filter: grayscale(0%) opacity(100%);
 }
