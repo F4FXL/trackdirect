@@ -1856,6 +1856,21 @@ function getWebsiteConfig($key) {
 }
 
 /**
+ * Returns an assoc array containing website related values from config
+ *
+ * @param {string} $key
+ * @return string
+ * */
+function getConfig($section, $key) {
+    $config = parse_ini_file(ROOT . '/../config/trackdirect.ini', true);
+    if (isset($config[$section]) && isset($config[$section][$key])) {
+        return $config[$section][$key];
+    }
+
+    return null;
+}
+
+/**
  * Convert coordinate to pixel position in heatmap image
  *
  * @param {float} $lat

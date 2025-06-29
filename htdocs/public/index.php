@@ -10,7 +10,6 @@ $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapa
 $hidenotmoving = $safe_GET['hidenotmoving'] == 1 ? 1 : 0;
 $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -280,10 +279,11 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                             <i class="fa-crosshairs fa"></i>
                         </a>
                     </li>
-                    <li><a href="#sb-tail-length" role="tab" title="Select history duration shown on map"><i class="fas fa-clock"></i></a></li>
-                    <li><a href="#sb-map-type" role="tab" title="Switch between map types"><i class="fas fa-map"></i></a></li>
+                    <li><a href="#sb-time-options" role="tab" title="Select history duration shown on map"><i class="fas fa-clock"></i></a></li>
+                    <li><a href="#sb-map-options" role="tab" title="Switch between map types and change map appearance"><i class="fas fa-map"></i></a></li>
                     <li><a href="#sb-show-hide" role="tab" title="Show hide items on the map"><i class="far fa-eye"></i></a>
                     <li><a href="#sb-search" role="tab" title="Search for a station"><i class="fas fa-search"></i></a>
+                    <li><a href="#sb-filtering" role="tab" title="Filtering"><i class="fas fa-filter"></i></a>
                     <li><a href="#sb-other" role="tab" title="Other"><i class="fas fa-ellipsis-h"></i></a>
                 </ul>
 
@@ -299,9 +299,10 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                     <h1 class="sidebar-header"><?php echo getWebsiteConfig('title'); ?></h1>
                 </div> -->
 
-                <div class="sidebar-pane" id="sb-tail-length">
-                    <h1 class="sidebar-header">Tail length</h1>
+                <div class="sidebar-pane" id="sb-time-options">
+                    <h1 class="sidebar-header">Time options</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
+                    <h2>Tail length</h2>
                     <?php
                         if (isSourceIdUsed(5)) : ?>
                             <p><a role="checkbox" <?php echo $time == 10 ? 'id="tdTopnavTimelengthDefault"' : ''?> href="javascript:void(0);" onclick="setTimeLength(10);" data-group="time-checkbox" class="toggle-checkbox">  <i class="far <?php echo $time == 10 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;10 minutes</a></p>
@@ -323,27 +324,100 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                     <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 24);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;1 day</a></p>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 48);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;2 days</a></p>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="setTimeLength(60 * 72);" data-group="time-checkbox" class="toggle-checkbox dropdown-content-checkbox-only-filtering dropdown-content-checkbox-hidden"><i class="far fa-square"></i>&nbsp;&nbsp;3 days</a></p>
+                    <h2>Time travel</h2>
+                    <?php if (!isAllowedToShowOlderData()) : ?>
+                        <div style="text-align: center;">
+                            <p style="max-width: 800px; display: inline-block; color: red;">
+                                The time travel feature that allows you to see the map as it looked like an earlier date is disabled on this website.
+                            </p>
+                        </div>
+                    <?php else : ?>
+                        <p>Select date and time to show map data for (enter time for your locale time zone). The regular time length select box can still be used to select how old data that should be shown (relative to selected date and time).</p>
+                        <p>*Note that the heatmap will still based on data from the latest hour (not the selected date and time).</p>
+                        <p>Date and time:</p>
+
+                        <form id="timetravel-form">
+                            <select id="timetravel-date" class="timetravel-select form-control">
+                                <option value="0" selected>Select date</option>
+                                <?php
+                                        $numberofdays = (int)getConfig('database', 'days_to_save_position_data');
+                                        echo $numberofdays;
+                                        for($i=0; $i < $numberofdays; $i++) :
+                                            $date = date('Y-m-d', strtotime("-$i days")); ?>
+                                            <option value="<?php echo $date; ?>"><?php echo $date; ?></option>
+                                <?php
+                                        endfor;
+                                ?>
+                            </select>
+
+                            <select id="timetravel-time" class="timetravel-select form-control">
+                                <option value="0" selected>Select time</option>
+                                <option value="00:00">00:00</option>
+                                <option value="01:00">01:00</option>
+                                <option value="02:00">02:00</option>
+                                <option value="03:00">03:00</option>
+                                <option value="04:00">04:00</option>
+                                <option value="05:00">05:00</option>
+                                <option value="06:00">06:00</option>
+                                <option value="07:00">07:00</option>
+                                <option value="08:00">08:00</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:00">18:00</option>
+                                <option value="19:00">19:00</option>
+                                <option value="20:00">20:00</option>
+                                <option value="21:00">21:00</option>
+                                <option value="22:00">22:00</option>
+                                <option value="23:00">23:00</option>
+                            </select>
+                            <input type="submit"
+                                value="Ok"
+                                onclick="
+                                    if ($('#timetravel-date').val() != '0' && $('#timetravel-time').val() != '0') {
+                                        trackdirect.setTimeLength(60, false);
+                                        var ts = moment($('#timetravel-date').val() + ' ' + $('#timetravel-time').val(), 'YYYY-MM-DD HH:mm').unix();
+                                        trackdirect.setTimeTravelTimestamp(ts);
+                                        $('#right-container-timetravel-content').html('Time travel to ' + $('#timetravel-date').val() + ' ' + $('#timetravel-time').val());
+                                        $('#right-container-timetravel').show();
+                                    } else {
+                                        trackdirect.setTimeTravelTimestamp(0, true);
+                                        $('#right-container-timetravel').hide();
+                                    }
+                                    $('#modal-timetravel').hide();
+                                    return false;"/>
+                        </form>
+                    <?php endif; ?>
                 </div>
 
-                <div class="sidebar-pane" id="sb-map-type">
+                <div class="sidebar-pane" id="sb-map-options">
                     <h1 class="sidebar-header">Map Options</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
+                    <h2>Type</h2>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="setMapType('roadmap');" data-group="map-type-checkbox" class="toggle-checkbox"><i class="far <?php echo $mapType == "roadmap" ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Roadmap</a></p>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="setMapType('terrain');" data-group="map-type-checkbox" class="toggle-checkbox"><i class="far <?php echo $mapType == "terrain" ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Terrain / Outdoors</a></p>
                     <?php if (getWebsiteConfig('leaflet_raster_tile_satellite') != null) : ?>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="setMapType('satellite');" data-group="map-type-checkbox" class="toggle-checkbox"><i class="far <?php echo $mapType == "satellite" ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Satellite</a></p>
-                    <?php endif; ?> 
+                    <?php endif; ?>
+                    <h2>Appearance</h2>
+                    <p><a role="checkbox" href="javascript:void(0);" onclick="setGrayscaleMode();" class="toggle-checkbox"><i class="far <?php echo $grayscale == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Grayscale Map</a></p>
                 </div>
                 <div class="sidebar-pane" id="sb-show-hide">
                     <h1 class="sidebar-header">Show / Hide Items on Map</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
                     <?php if (isSourceIdUsed(1)) : ?>
-                        <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, false);" class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$phg]; ?>"></i></i>&nbsp;&nbsp;PHG Circles</a></p>
-                        <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, true);"  class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$rng]; ?>"></i></i>&nbsp;&nbsp;Range Circles</a></p>
+                        <h2>Circles</h2>
+                        <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, false);" class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$phg]; ?>"></i></i>&nbsp;&nbsp;PHG</a></p>
+                        <p><a role="checkbox" href="javascript:void(0);" onclick="toggleCircles(this, true);"  class="toggle-checkbox-eye-no-auto"><i class="<?php echo ['far fa-eye-slash', 'far fa-eye', 'fas fa-eye'][$rng]; ?>"></i></i>&nbsp;&nbsp;Range</a></p>
+                        <h2>Station types</h2>
                         <p><a role="checkbox" href="javascript:void(0);" onclick="toggleStationaryStations();"  class="toggle-checkbox-eye"><i class="far <?php echo $hidenotmoving == 0 ? "fa-eye" : "fa-eye-slash"; ?>"></i></i>&nbsp;&nbsp;Not moving stations</a></p>
-                        <?php if (isSourceIdUsed(1)) : ?>
                         <p><a role="checkbox" href="javascript:void(0);" onclick="toggleInternetStations();"  class="toggle-checkbox-eye"><i class="far <?php echo $hideinternet == 0 ? "fa-eye" : "fa-eye-slash"; ?>"></i></i>&nbsp;&nbsp;Internet stations</a></p>
-                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
                 <div class="sidebar-pane" id="sb-search">
@@ -353,6 +427,10 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                     <hr>
                     <p><a href="/views/search.php" class="tdlink tdlink-sb"><i class="fas fa-search-plus"></i>&nbsp;&nbsp;Advancded Search</a></p>
                 </div>
+                <div class="sidebar-pane" id="sb-filtering">
+                    <h1 class="sidebar-header">Filtering</h1>
+                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
+                </div>
                 <div class="sidebar-pane" id="sb-other">
                     <h1 class="sidebar-header">Other</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
@@ -361,7 +439,6 @@ $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
                 <div class="sidebar-pane" id="sb-settings">
                     <h1 class="sidebar-header">Settings</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="setGrayscaleMode();" class="toggle-checkbox"><i class="far <?php echo $grayscale == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Grayscale Map</a></p>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="toggleImperialUnits();" class="toggle-checkbox"><i class="far <?php echo $imperialunits == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Imperial Units</a></p>
                 </div>
             </div>
