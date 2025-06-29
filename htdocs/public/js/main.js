@@ -244,9 +244,7 @@ function setGrayscaleMode(enabled) {
     var isGray = document.querySelector('.grayscale-tiles') !== null;
     enabled = !isGray;
   }
-
-  console.log("Grayscale enabled " + enabled);
-
+  
   allTileContainers.forEach(function(container) {
       if (enabled) {
           container.classList.remove('grayscale-tiles-dummy');
