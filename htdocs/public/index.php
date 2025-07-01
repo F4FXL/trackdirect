@@ -422,6 +422,7 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                 <div class="sidebar-pane" id="sb-filtering">
                     <h1 class="sidebar-header">Filtering</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
+                    <div id="td-sidebar-filtering"></div>
                 </div>
                 <div class="sidebar-pane" id="sb-other">
                     <h1 class="sidebar-header">Other</h1>

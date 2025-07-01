@@ -184,22 +184,29 @@ jQuery(document).ready(function ($) {
       // Time travel is stopped when filtering is stopped
       $("#right-container-timetravel").hide();
 
+      //clean up side bar
+      $('#td-sidebar-filtering').html("");
+
       // Reset tail length to default when filtering is stopped
       $(".dropdown-content-checkbox-only-filtering").addClass("dropdown-content-checkbox-hidden");
       if(trackdirect.getTimeLength() > 360) trackdirect.setTimeLength(60);
     } else {
       var counts = {};
+      var ids = {};
       
       for (var i = 0; i < packets.length; i++) {
         // Note that if related is set to 1, it is included since it is related to the station we are filtering on
         if (packets[i].related == 0) {
           counts[packets[i]["station_name"]] = 1 + (counts[packets[i]["station_name"]] || 0);
+          ids[packets[i]["station_name"]] = packets.station_id;
         }
       }
 
       let snamelist = Object.keys(counts).join(",");
       url.searchParams.set('snamelist', snamelist);
       url.searchParams.delete('sid'); // use names, more userfriendly than ids.
+
+      $('#td-sidebar-filtering').html("Filtering on :<ul><li>" + Object.keys(counts).join("</li><li>") + "</li></ul>");
 
       $("#right-container-filtered-content").html(
         "Filtering on " + Object.keys(counts).length + " station(s)"
