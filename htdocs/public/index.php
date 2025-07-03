@@ -290,10 +290,10 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                     </li>
                     <li><a href="#sb-time-options" role="tab" title="Select history duration shown on map"><i class="fas fa-clock"></i></a></li>
                     <li><a href="#sb-map-options" role="tab" title="Switch between map types and change map appearance"><i class="fas fa-map"></i></a></li>
-                    <li><a href="#sb-show-hide" role="tab" title="Show hide items on the map"><i class="far fa-eye"></i></a>
-                    <li><a href="#sb-search" role="tab" title="Search for a station"><i class="fas fa-search"></i></a>
-                    <li><a href="#sb-filtering" role="tab" title="Filtering"><i class="fas fa-filter"></i></a>
-                    <li><a href="#sb-other" role="tab" title="Other"><i class="fas fa-ellipsis-h"></i></a>
+                    <li><a href="#sb-show-hide" role="tab" title="Show hide items on the map"><i class="far fa-eye"></i></a></li>
+                    <li><a href="#sb-search" role="tab" title="Search for a station"><i class="fas fa-search"></i></a></li>
+                    <li><a href="#sb-filtering" role="tab" title="Filtering" class="icon-badge"><i class="fas fa-filter"><span id="td-filters-count" class="badge">3</span></i></a></li>
+                    <li><a href="#sb-other" role="tab" title="Other"><i class="fas fa-ellipsis-h"></i></a></li>
                 </ul>
 
                 <ul role="tablist">

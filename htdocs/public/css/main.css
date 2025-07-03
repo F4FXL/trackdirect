@@ -942,3 +942,43 @@ input[type=submit]:hover {
 	color: black;
 }
 
+.clear-filter {
+	font-size: 1.3em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
+}
+
+.clear-filter a {
+	font-size: 1.5em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
+}
+
+.clear-filter a:hover {
+	font-family: "Sans Serif", "Helvetica";
+  font-weight: bolder;
+	color: black;
+}
+
+.icon-badge {
+  position: relative;
+  display: inline-block;
+}
+
+.icon-badge .badge {
+	position: absolute;
+	top: 2px;
+	right: 1px;
+	background: #d00;
+	color: #fff;
+	border-radius: 50%;
+	font-size: 0.7em;
+	min-width: 1.2em;
+	height: 1.2em;
+	line-height: 1.1em;
+	text-align: center;
+	pointer-events: none;
+	font-family: sans-serif;
+	box-shadow: 0 0 0 1.5px #fff;
+  display: none;
+}

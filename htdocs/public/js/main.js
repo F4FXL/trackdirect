@@ -180,12 +180,13 @@ jQuery(document).ready(function ($) {
       url.searchParams.delete('sid');
       // We are not filtering any more.
       $("#right-container-filtered").hide();
+      $('#td-filters-count').hide();
 
       // Time travel is stopped when filtering is stopped
       $("#right-container-timetravel").hide();
 
       //clean up side bar
-      $('#td-sidebar-filtering').html("");
+      $('#td-sidebar-filtering').html("<h2>No Filters active</h2>");
 
       // Reset tail length to default when filtering is stopped
       $(".dropdown-content-checkbox-only-filtering").addClass("dropdown-content-checkbox-hidden");
@@ -198,15 +199,28 @@ jQuery(document).ready(function ($) {
         // Note that if related is set to 1, it is included since it is related to the station we are filtering on
         if (packets[i].related == 0) {
           counts[packets[i]["station_name"]] = 1 + (counts[packets[i]["station_name"]] || 0);
-          ids[packets[i]["station_name"]] = packets.station_id;
+          ids[packets[i]["station_name"]] = packets[i].station_id;
         }
       }
+
+      // handle filtered stations in side bar
+      var html = "<h2>Filtering on :</h2>\n";
+      Object.keys(counts).forEach(call => {
+        var curId = ids[call];
+        console.log(curId);
+        var otherids = Object.values(ids).filter(i__ => i__ != curId);
+        html += '<div class="clear-filter"><a href="#" onclick="trackdirect.filterOnStationId([' + otherids.join(",") + ']); return false";>&times;</a>&nbsp;&nbsp;' + call + '</div>\n';
+        console.log(html);
+      });
+      $('#td-sidebar-filtering').html(html);
+
+      // handle the number of filters badge
+      $('#td-filters-count').html(Object.keys(counts).length);
+      $('#td-filters-count').show();
 
       let snamelist = Object.keys(counts).join(",");
       url.searchParams.set('snamelist', snamelist);
       url.searchParams.delete('sid'); // use names, more userfriendly than ids.
-
-      $('#td-sidebar-filtering').html("Filtering on :<ul><li>" + Object.keys(counts).join("</li><li>") + "</li></ul>");
 
       $("#right-container-filtered-content").html(
         "Filtering on " + Object.keys(counts).length + " station(s)"
