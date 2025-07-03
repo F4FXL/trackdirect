@@ -14,5 +14,23 @@ RewriteEngine on
 RewriteRule ^/?(js|css|images|symbols|data|heatmaps|crossdomain.*|favicon.*|\.well-known|browserconfig\.xml|robots\.txt|ads\.txt)($|/) - [L]
 
 # Rewrite url
+#RewriteCond %{REQUEST_METHOD} !=POST
+#RewriteRule ^(.*)$ index.php?view=$1 [NC,L,QSA]
+
+
+# Prend en compte /views/quelquechose.php (y compris sous-dossiers)
 RewriteCond %{REQUEST_METHOD} !=POST
-RewriteRule ^(.*)$ index.php?view=$1 [NC,L,QSA]
+
+# Capture tout ce qui est après /views/
+RewriteCond %{REQUEST_URI} ^/views/(.+\.php)$
+
+# Vérifie que le fichier existe physiquement
+RewriteCond %{DOCUMENT_ROOT}/views/%1 -f
+
+# Redirige vers index.php?view=views/chemin/vers/fichier.php
+RewriteRule ^views/(.+\.php)$ index.php?view=views/$1 [NC,L,QSA]
+
+# Si ce n'est pas un fichier existant sous /views, et que ça ressemble à un .php, erreur 404
+RewriteCond %{REQUEST_URI} ^/views/(.+\.php)$
+RewriteCond %{DOCUMENT_ROOT}/views/%1 !-f
+RewriteRule ^ - [R=404,L]
