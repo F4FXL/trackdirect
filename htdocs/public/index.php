@@ -316,7 +316,7 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                         <h2>Address</h2>
                         <p> 
                             <div class="geosearch-autocomplete-container">
-                                <p>Sear for an address, city ...</p>
+                                <p>Search for an address, city ...</p>
                                 <input type="text" name="geosearch-address" id="geosearch-address" autocomplete="off" placeholder="Address, city name, state ...." style="width: 100%">
                                 <ul id="geosearch-autocomplete-results" style="width: 100%"></ul>
                             </div>
