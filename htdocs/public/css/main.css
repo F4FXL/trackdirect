@@ -982,3 +982,9 @@ input[type=submit]:hover {
 	box-shadow: 0 0 0 1.5px #fff;
   display: none;
 }
+
+#goto-my-location {
+	font-size: 1.3em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
+}

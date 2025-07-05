@@ -198,6 +198,86 @@ var trackdirect = {
     }
   },
 
+    /**
+   * Set map center
+   * @param {string} locator
+   * @return true on success otherwise false
+   */
+  setCenterLocator: function (locator) {
+    if (!this.isValidMaidenhead(locator)) return false;
+
+    let zoom = 15;
+    locator = locator.trim();
+    const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const a = 'abcdefghijklmnopqrstuvwxyz';
+
+    let lon = -180, lat = -90;
+    let sizeLon = 20, sizeLat = 10;
+
+    if (locator.length >= 2) {
+        lon += A.indexOf(locator[0].toUpperCase()) * 20;
+        lat += A.indexOf(locator[1].toUpperCase()) * 10;
+        zoom = 4;
+    }
+    if (locator.length >= 4) {
+        lon += parseInt(locator[2]) * 2;
+        lat += parseInt(locator[3]) * 1;
+        sizeLon /= 10; // 20 -> 2
+        sizeLat /= 10; // 10 -> 1
+        zoom = 6;
+    }
+    if (locator.length >= 6) {
+        lon += A.indexOf(locator[4].toUpperCase()) * (sizeLon / 24);
+        lat += A.indexOf(locator[5].toUpperCase()) * (sizeLat / 24);
+        sizeLon /= 24;
+        sizeLat /= 24;
+        zoom = 10;
+    }
+    if (locator.length >= 8) {
+        lon += parseInt(locator[6]) * (sizeLon / 10);
+        lat += parseInt(locator[7]) * (sizeLat / 10);
+        sizeLon /= 10;
+        sizeLat /= 10;
+        zoom = 13;
+    }
+    if (locator.length >= 10) {
+        lon += a.indexOf(locator[8].toLowerCase()) * (sizeLon / 24);
+        lat += a.indexOf(locator[9].toLowerCase()) * (sizeLat / 24);
+        sizeLon /= 24;
+        sizeLat /= 24;
+        zoom = 16;
+    }
+
+    lat += sizeLat / 2;
+    lon += sizeLat / 2;
+
+    if(isNaN(lat) || isNaN(lon))
+      return false;
+
+    this.setCenter(lat, lon, zoom);
+    return true;
+  },
+
+  isValidMaidenhead: function (locator) {
+    if (typeof locator !== "string") return false;
+    locator = locator.trim();
+    const n = locator.length;
+    if (![2,4,6,8,10].includes(n)) return false;
+    // "Letter" = [A-Za-z], "Digit" = [0-9]
+    const letter = "[A-Za-z]";
+    const digit  = "[0-9]";
+    const letterAX = "[A-Xa-x]";
+    // Expressions régulières
+    const regex = {
+        2:  new RegExp(`^${letter}{2}$`),
+        4:  new RegExp(`^${letter}{2}${digit}{2}$`),
+        6:  new RegExp(`^${letter}{2}${digit}{2}${letter}{2}$`),
+        8:  new RegExp(`^${letter}{2}${digit}{2}${letter}{2}${digit}{2}$`),
+        10: new RegExp(`^${letter}{2}${digit}{2}${letter}{2}${digit}{2}${letterAX}{2}$`)
+    };
+    return regex[n].test(locator);
+  },
+
   /**
    * Set zoom
    * @param {int} value

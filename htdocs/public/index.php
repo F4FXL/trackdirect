@@ -262,32 +262,7 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
             <div class="sidebar-tabs">
                 <ul role="tablist">
                     <!-- <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li> -->
-                    <li> 
-                        <a  role="tab"
-                            href=""
-                            onclick="
-                                window.sidebar.close();
-                                if (location.protocol != 'https:') {
-                                    trackdirect.setCenter(); // Will go to default position
-                                } else {
-                                    trackdirect.setMapLocationByGeoLocation(
-                                        function(errorMsg) {
-                                            var msg = 'We failed to determine your current location by using HTML 5 Geolocation functionality';
-                                            if (typeof errorMsg !== 'undefined' && errorMsg != '') {
-                                                msg += ' (' + errorMsg + ')';
-                                            }
-                                            msg += '.';
-                                            alert(msg);
-                                        },
-                                        function() {},
-                                        5000
-                                    );
-                                }
-                                return false;"
-                            title="Go to my current position">
-                            <i class="fa-crosshairs fa"></i>
-                        </a>
-                    </li>
+                    <li><a href="#sb-map-location" role="tab" title="Go to specific location on map"><i class="fas fa-map-marker-alt"></i></a></li>
                     <li><a href="#sb-time-options" role="tab" title="Select history duration shown on map"><i class="fas fa-clock"></i></a></li>
                     <li><a href="#sb-map-options" role="tab" title="Switch between map types and change map appearance"><i class="fas fa-map"></i></a></li>
                     <li><a href="#sb-show-hide" role="tab" title="Show hide items on the map"><i class="far fa-eye"></i></a></li>
@@ -304,10 +279,36 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
 
             <!-- Tab panes -->
             <div class="sidebar-content">
-                <!-- <div class="sidebar-pane" id="home">
-                    <h1 class="sidebar-header"><?php echo getWebsiteConfig('title'); ?></h1>
-                </div> -->
-
+                <div class="sidebar-pane" id="sb-map-location">
+                    <h1 class="sidebar-header">Navigate on map</h1>
+                    <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
+                    <p><br><a  href=""
+                        id="goto-my-location"
+                        onclick="
+                            window.sidebar.close();
+                            if (location.protocol != 'https:') {
+                                trackdirect.setCenter(); // Will go to default position
+                            } else {
+                                trackdirect.setMapLocationByGeoLocation(
+                                    function(errorMsg) {
+                                        var msg = 'We failed to determine your current location by using HTML 5 Geolocation functionality';
+                                        if (typeof errorMsg !== 'undefined' && errorMsg != '') {
+                                            msg += ' (' + errorMsg + ')';
+                                        }
+                                        msg += '.';
+                                        alert(msg);
+                                    },
+                                    function() {},
+                                    5000
+                                );
+                            }
+                            return false;"
+                        title="Go to my current position">
+                        <i class="fa-crosshairs fa"></i>&nbsp;&nbsp;Go to my location
+                        </a></p>
+                        <hr>
+                        <p>Go to a specific QRA Locator (2,6, 8 and 10 digits are supported)</p><p><input type="text" id="qra-locator" style="width: 100%" placeholder="QRA Locator"></p>
+                </div>
                 <div class="sidebar-pane" id="sb-time-options">
                     <h1 class="sidebar-header">Time options</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>

@@ -237,13 +237,32 @@ jQuery(document).ready(function ($) {
 jQuery(document).ready(function ($) {
   $('#station-search').keypress(function (e) {
     if (e.which == 13) {
-        var q = $('#station-search').val();
+        let q = $('#station-search').val();
         let url = new URL(window.location);
         url.pathname = "/views/search.php";
         url.searchParams.set("q", q);
         url.searchParams.set("seconds", 0);
         loadView(url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
         window.sidebar.close();
+    }
+  });
+});
+
+// handle locator field
+jQuery(document).ready(function ($) {
+  $('#qra-locator').keypress(function (e) {
+    if (e.which == 13) {
+        let value = $('#qra-locator').val().toString();
+        if(value.trim() != '') {
+          if(!window.trackdirect.setCenterLocator(value))
+            window.alert(value + " is not a valid QRA Locator.");
+          if(value.length >= 10) {
+            $('#qra-locator').val(value.slice(0, 8).toUpperCase() + value.slice(-2).toLowerCase());
+          }
+          else {
+            $('#qra-locator').val(value.toUpperCase());
+          }
+        }
     }
   });
 });
