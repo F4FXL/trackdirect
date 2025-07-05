@@ -268,6 +268,7 @@ jQuery(document).ready(function ($) {
 });
 
 function setMapType(value) {
+    var isGray = document.querySelector('.grayscale-tiles') !== null;
     trackdirect.setMapType(value)
     const url = new URL(window.location);
     if(value != 'roadmap')
@@ -275,7 +276,7 @@ function setMapType(value) {
     else
       url.searchParams.delete('maptype');
     window.history.pushState({}, '', url);
-    setGrayscaleMode();
+    setGrayscaleMode(isGray);
 }
 
 function setGrayscaleMode(enabled) {

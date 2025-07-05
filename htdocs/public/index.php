@@ -203,9 +203,9 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                         Object.values(L.TileLayer.Provider.providers).forEach(function(provider) {
                             provider.options = provider.options || {};
                             if (provider.options.className) {
-                                provider.options.className += ' grayscale-tiles-dummy';
+                                provider.options.className += '<?php echo $grayscale == 1 ? 'grayscale-tiles' : 'grayscale-tiles-dummy' ?>';
                             } else {
-                                provider.options.className = 'grayscale-tiles-dummy';
+                                provider.options.className = '<?php echo $grayscale == 1 ? 'grayscale-tiles' : 'grayscale-tiles-dummy' ?>';;
                             }
                         });
                         window.sidebar = null;
