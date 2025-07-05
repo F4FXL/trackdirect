@@ -69,6 +69,11 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
             <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-providers/1.11.0/leaflet-providers.min.js" integrity="sha512-TO+Wd5hbpDsACTmvzSqAZL83jMQCXGRFNoS4WZxcxrlJBTdgMYaT7g5uX49C5+Kbuxzlg2A+TFJ6UqdsXuOKLw==" crossorigin="anonymous"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js" integrity="sha512-KhIBJeCI4oTEeqOmRi2gDJ7m+JARImhUYgXWiOTIp9qqySpFUAJs09erGKem4E5IPuxxSTjavuurvBitBmwE0w==" crossorigin="anonymous"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js" integrity="sha512-V8RRDnS4BZXrat3GIpnWx+XNYBHQGdK6nKOzMpX4R0hz9SPWt7fltGmmyGzUkVFZUQODO1rE+SWYJJkw3SYMhg==" crossorigin="anonymous"></script>
+
+            <!-- address search -->
+            <script src="https://cdn.jsdelivr.net/npm/leaflet-geosearch@4.2.0/dist/bundle.min.js"></script>
+            <link rel="stylesheet" href="/css/geosearch.css"/>
+            <script src="/js/geosearch.js"></script>
         <?php endif; ?>
 
         <!-- Track Direct jslib -->
@@ -306,8 +311,16 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                         title="Go to my current position">
                         <i class="fa-crosshairs fa"></i>&nbsp;&nbsp;Go to my location
                         </a></p>
-                        <hr>
+                        <h2>Locator</h2>
                         <p>Go to a specific QRA Locator (2,6, 8 and 10 digits are supported)</p><p><input type="text" id="qra-locator" style="width: 100%" placeholder="QRA Locator"></p>
+                        <h2>Address</h2>
+                        <p> 
+                            <div class="geosearch-autocomplete-container">
+                                <p>Sear for an address, city ...</p>
+                                <input type="text" name="geosearch-address" id="geosearch-address" autocomplete="off" placeholder="Address, city name, state ...." style="width: 100%">
+                                <ul id="geosearch-autocomplete-results" style="width: 100%"></ul>
+                            </div>
+                        </p>
                 </div>
                 <div class="sidebar-pane" id="sb-time-options">
                     <h1 class="sidebar-header">Time options</h1>

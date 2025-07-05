@@ -292,7 +292,7 @@ a {
   width: 100%;
 }
 
-input[type=text], select, textarea {
+input[type=text], select, textarea, map {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -323,20 +323,6 @@ input[type=submit]:hover {
   display: inline-block;
   width:  100%;
 }
-
-
-
-#maintainer-container {
-}
-
-/* @media screen and (min-width: 1100px) {
-  #cordinates-container {
-    display: block;
-  }
-  #status-container {
-    display: block;
-  }
-} */
 
 #bottominfo-container {
   position: absolute;

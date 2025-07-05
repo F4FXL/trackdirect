@@ -1,0 +1,31 @@
+#geosearch-autocomplete-results {
+    position: absolute;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #bbb;
+    width: 300px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    margin-top: 2px;
+    padding: 0;
+}
+
+#geosearch-autocomplete-results li {
+    list-style: none;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+#geosearch-autocomplete-results li:hover {
+    background: #f0f0f0;
+}
+
+.geosearch-autocomplete-container {
+    position: relative;
+    width: 100%;
+}
+
+#geosearch-autocomplete-results li.selected {
+    background: #d4e6fa !important;
+}
