@@ -17,7 +17,7 @@ COPY . /root/trackdirect
 # sites-enaled shall only contain symlinks ! Original code copied file into sites-enabled !
 COPY config/apache-default.conf /etc/apache2/sites-available/000-default.conf 
 # same goes for configs enabled
-COPY config/apache-security.conf /etc/apache2/config-available/security.conf
+COPY config/apache-security.conf /etc/apache2/conf-available/security.conf
 
 RUN mkdir -p /var/cache/apache2/mod_cache_disk/trackdirect/
 RUN chown -R www-data:www-data /var/cache/apache2/mod_cache_disk

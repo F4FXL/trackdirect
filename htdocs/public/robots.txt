@@ -1,5 +1,40 @@
-User-agent: *
-Disallow: /
+# Autoriser les moteurs de recherche principaux, sauf /heatmaps/ et /data/
+User-agent: Googlebot
 Disallow: /heatmaps/
 Disallow: /data/
 
+User-agent: Bingbot
+Disallow: /heatmaps/
+Disallow: /data/
+
+User-agent: Slurp
+Disallow: /heatmaps/
+Disallow: /data/
+
+User-agent: DuckDuckBot
+Disallow: /heatmaps/
+Disallow: /data/
+
+User-agent: Baiduspider
+Disallow: /heatmaps/
+Disallow: /data/
+
+User-agent: Yandex
+Disallow: /heatmaps/
+Disallow: /data/
+
+User-agent: Exabot
+Disallow: /heatmaps/
+Disallow: /data/
+
+User-agent: facebot
+Disallow: /heatmaps/
+Disallow: /data/
+
+User-agent: ia_archiver
+Disallow: /heatmaps/
+Disallow: /data/
+
+# Bloquer tous les autres robots
+User-agent: *
+Disallow: /

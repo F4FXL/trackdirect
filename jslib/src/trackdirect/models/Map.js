@@ -1504,8 +1504,19 @@ trackdirect.models.Map.prototype._renderCoordinatesContainer = function (
     let content = "";
     content += this._getGpsDegreeFromGpsDecimal(lat, "lat");
     content += " " + this._getGpsDegreeFromGpsDecimal(lng, "lon");
-    content += "<br>" + lat.toFixed(5) + ", " + lng.toFixed(5);
-    content += "<br>" + this._getMaidenheadLocatorFromGpsDecimal(lat, lng);
+    content += " | " + lat.toFixed(5) + ", " + lng.toFixed(5);
+    content += " | ";
+
+    let locatorLen = 10;
+    let zoom = this.getZoom();
+    if(zoom <= 4) locatorLen = 2;
+    else if(zoom <= 6) locatorLen = 4;
+    else if(zoom <= 10) locatorLen = 6;
+    else if(zoom <= 13) locatorLen = 8;
+    
+    let locator = this._getMaidenheadLocatorFromGpsDecimal(lat, lng, locatorLen);
+    content += locator;
+    // content += '<b>' + locator.slice(0,6) + '</b>' + locator.slice(-4);
 
     $("#" + options.coordinatesContainer).html(content);
   }
@@ -1556,24 +1567,63 @@ trackdirect.models.Map.prototype._getGpsDegreeFromGpsDecimal = function (
 /**
  * Convert decimal gps position to maidenhead locator
  * @param {float} lat
- * @param {float} lng
+ * @param {float} lon
  * @return {string}
  */
 trackdirect.models.Map.prototype._getMaidenheadLocatorFromGpsDecimal = function (
   lat,
-  lng,
+  lon,
+  digits = 6
 ) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVX';
-  let result = '';
-  lng = lng + 180;
-  lat = lat + 90;
-  result = chars.charAt(parseInt(lng / 20));
-  result += chars.charAt(parseInt(lat / 10));
-  result += parseInt(lng / 2 % 10);
-  result += parseInt(lat % 10);
-  lng_r = (lng - parseInt(lng / 2) * 2) * 60;
-  lat_r = (lat - parseInt(lat)) * 60;
-  result += chars.charAt(parseInt(lng_r / 5));
-  result += chars.charAt(parseInt(lat_r / 2.5));
-  return result;
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+    const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const a = 'abcdefghijklmnopqrstuvwxyz';
+
+    lon += 180;
+    lat += 90;
+
+    // Fields (2 caractères)
+    let fieldLon = Math.floor(lon / 20);
+    let fieldLat = Math.floor(lat / 10);
+
+    // Squares (2 caractères)
+    let squareLon = Math.floor((lon % 20) / 2);
+    let squareLat = Math.floor((lat % 10) / 1);
+
+    // SubSquares (2 caractères)
+    let subLon = Math.floor((((lon % 2) / 2) * 24));
+    let subLat = Math.floor((((lat % 1) / 1) * 24));
+
+    // Extended square (2 chiffres)
+    let remainLon = (((lon % 2) / 2) * 24) - subLon;
+    let remainLat = (((lat % 1) / 1) * 24) - subLat;
+    let extLon = Math.floor(remainLon * 10);
+    let extLat = Math.floor(remainLat * 10);
+
+    // Extended subsquare (2 lettres)
+    let extRemainLon = remainLon * 10 - extLon;
+    let extRemainLat = remainLat * 10 - extLat;
+    let ext2Lon = Math.floor(extRemainLon * 24);
+    let ext2Lat = Math.floor(extRemainLat * 24);
+
+    // Construction progressive
+    let locator = "";
+
+    if (digits >= 2) {
+        locator += A[fieldLon] + A[fieldLat];
+    }
+    if (digits >= 4) {
+        locator += squareLon.toString() + squareLat.toString();
+    }
+    if (digits >= 6) {
+        locator += A[subLon] + A[subLat];
+    }
+    if (digits >= 8) {
+        locator += extLon.toString() + extLat.toString();
+    }
+    if (digits >= 10) {
+        locator += a[ext2Lon] + a[ext2Lat]; // or A[...] + A[...] for uppercase
+    }
+
+    return locator;
 };

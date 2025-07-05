@@ -20,7 +20,7 @@
         Search by entering the beginning of the station name/id (or just click search to list all).
     </p>
 
-    <form id="station-search-form" method="get" action="">
+    <form id="station-search-form" method="get" >
         <div style="margin-bottom: 5px;">
             <select name ="seconds" style="width: 280px;" id="station-search-form-seconds">
                 <option <?php echo ($seconds == 0 ? 'selected' : ''); ?> value="0">Include all known stations in search</option>
@@ -61,7 +61,7 @@
                         <th>Latest heard</th>
                         <th>Comment/Other</th>
                         <th>Map</th>
-
+                        <th>Filter</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,8 +86,8 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if ($foundStation->latestConfirmedPacketTimestamp > (time() - 60*60*24)) : ?>
-                                <a href="?sid=<?php echo $foundStation->id; ?>" onclick="
+                            <?php if (true) ://($foundStation->latestConfirmedPacketTimestamp > (time() - 60*60*24)) : ?>
+                                <a class="tdlink" href="/?sid=<?php echo $foundStation->id; ?>" onclick="
                                     if (window.parent && window.parent.trackdirect) {
                                         $('.modal', parent.document).hide();
                                         window.parent.trackdirect.filterOnStationId([]);
@@ -97,6 +97,16 @@
                             <?php else : ?>
                                 &nbsp;
                             <?php endif; ?>
+                        </td>
+                        <td>
+                            <a class="tdlink" href="javascript:void(0);" onclick="
+                                if (window.parent && window.parent.trackdirect) {
+                                    let ids=window.parent.trackdirect.getFilterStationIds();
+                                    if(!ids.includes(<?php echo $foundStation->id; ?>))
+                                        ids.push(<?php echo $foundStation->id; ?>);
+                                    window.parent.trackdirect.filterOnStationId(ids);
+                                    return false;
+                                }">Add to filter</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -122,11 +132,17 @@
             }
         });
 
-        $('#station-search-form').bind('submit',function(e) {
-            var q = $('#station-search-form-q').val();
-            var seconds = $('#station-search-form-seconds').val();
-	    loadView('/views/search.php?imperialUnits=<?php echo $_GET['imperialUnits'] ?? '0'; ?>&q=' + q + '&seconds=' + seconds);
+        document.getElementById('station-search-form').addEventListener('submit',function(e) {
             e.preventDefault();
+            let url = new URL(window.location);
+            const formData = new FormData(this);
+            for (const [key, value] of formData.entries()) {
+                url.searchParams.set(key, value);
+            }
+	        loadView(url.toString().replaceAll("%2C", ","));
+
         });
+
+        window.viewParams = ["q", "seconds"];
     });
 </script>

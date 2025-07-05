@@ -1,0 +1,23 @@
+.sidebar-close
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar-close i {
+  font-size: 32px; 
+  color: #fff;
+}
+
+.sidebar-left {
+	top: 0 !important;
+	bottom: 0 !important;
+	left: 0 !important;
+}
+
+.sidebar-top {
+	top: 0 !important;
+	left: 0 !important;
+  right: 0 !important;
+}

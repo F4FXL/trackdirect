@@ -48,11 +48,11 @@ a {
 
 /* Set the position of the map */
 #map-container {
-  position:absolute;
-  top: 39px;
-  left: 0px;
-  width: 100%;
-  height: calc( 100% - 62px );
+  /* position:absolute; */
+  /* top: 0px;
+  left: 0px;  */
+  /* width: 100%; */
+  height: calc( 100% - 31px );
   z-index:10;
 }
 
@@ -213,7 +213,7 @@ a {
 .modal {
   display: none;
   position: fixed;
-  z-index: 300;
+  z-index: 300000;
   padding-top: 100px; /* Location of the box */
   left: 0;
   top: 0;
@@ -292,7 +292,7 @@ a {
   width: 100%;
 }
 
-input[type=text], select, textarea {
+input[type=text], select, textarea, map {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -324,69 +324,63 @@ input[type=submit]:hover {
   width:  100%;
 }
 
-#status-container {
-  font-weight: bold;
-  white-space:nowrap;
-  display: none;
-}
-
-#maintainer-container {
-}
-
-@media screen and (min-width: 1100px) {
-  #cordinates-container {
-    display: block;
-  }
-  #status-container {
-    display: block;
-  }
-}
-
 #bottominfo-container {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   width: 100%;
-  height: 13px;
+  height: 31px;
   background: #efeeee;
-  padding: 4px;
   font-size: 12px;
   border: solid 1px #d9d9d9;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;    /* Les items sont alignés à droite */
+  align-items: center;
+  padding: 4px 12px 4px 0;
+  box-sizing: border-box;
+  gap: 10px;
 }
 
-
-#cordinates-container {
-  clear: both;
+/* Le container de coordonnées prend toute la place dispo à gauche, texte aligné à droite */
+#coordinate-container {
+  flex: 1 1 0;
   color: #4d4d4d;
+  white-space: nowrap;
+  text-align: right;
   font-size: 12px;
-  display: none;
-  min-width: 130px;
-  display: none;
+  min-width: 80px;
+  font-family: "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
 }
 
+
+/* Le statut est à droite, texte à droite aussi */
 #status-container {
-  white-space:nowrap;
-  line-height: 20px;
+  flex: 0 0 auto;
   font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+  text-align: right;
+  line-height: 20px;
+  min-width: 80px;
 }
 
-@media screen and (min-width: 800px) {
-  #cordinates-container {
-    display: block;
+@media screen and (max-width: 630px) {
+  #coordinate-container {
+    display: none !important;
   }
 }
 
 #right-container {
   position: absolute;
   right: 0px;
+  top: 0px;
   text-align: right;
 }
 
 #right-container-info, #right-container-filtered, #right-container-timetravel {
   position:relative;
   right:10px;
+  top: 10px;
   z-index:50;
 
   color: #4d4d4d;
@@ -926,4 +920,57 @@ input[type=submit]:hover {
 
 .gm-style .gm-style-iw-d {
   margin-top: -30px;
+}
+
+.toggle-checkbox, .toggle-checkbox-eye, .toggle-checkbox-eye-no-auto, .tdlink-sb {
+	font-size: 1.3em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
+}
+
+.clear-filter {
+	font-size: 1.3em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
+}
+
+.clear-filter a {
+	font-size: 1.5em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
+}
+
+.clear-filter a:hover {
+	font-family: "Sans Serif", "Helvetica";
+  font-weight: bolder;
+	color: black;
+}
+
+.icon-badge {
+  position: relative;
+  display: inline-block;
+}
+
+.icon-badge .badge {
+	position: absolute;
+	top: 2px;
+	right: 1px;
+	background: #d00;
+	color: #fff;
+	border-radius: 50%;
+	font-size: 0.7em;
+	min-width: 1.2em;
+	height: 1.2em;
+	line-height: 1.1em;
+	text-align: center;
+	pointer-events: none;
+	font-family: sans-serif;
+	box-shadow: 0 0 0 1.5px #fff;
+  display: none;
+}
+
+#goto-my-location {
+	font-size: 1.3em;
+	font-family: "Sans Serif", "Helvetica";
+	color: black;
 }

@@ -12,3 +12,4 @@ if (!defined('ROOT')) {
 
     ini_set("display_errors", "false");
 }
+?>

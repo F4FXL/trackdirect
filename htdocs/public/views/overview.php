@@ -242,7 +242,7 @@
                 <div>
                     <div class="overview-content-summary-hr">&nbsp;</div>
                     <div class="overview-content-summary-cell-position">
-                        <a href="?sid=<?php echo $station->id; ?>" onclick="
+                        <a class="tdlink" href="/?sid=<?php echo $station->id; ?>" onclick="
                             if (window.parent && window.parent.trackdirect) {
                                 $('.modal', parent.document).hide();
                                 window.parent.trackdirect.filterOnStationId([]);
@@ -544,6 +544,8 @@
                     });
                 <?php endif; ?>
             }
+
+            window.viewParams = ["id"];
         });
     </script>
 <?php endif; ?>

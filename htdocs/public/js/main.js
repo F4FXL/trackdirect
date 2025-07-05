@@ -33,20 +33,34 @@ if (!inIframe()) {
 
 // Set correct time length option to active
 jQuery(document).ready(function ($) {
-  $("#tdTopnavTimelengthDefault").addClass("dropdown-content-checkbox-active");
+  // document.querySelectorAll('.tdTopnavTimelengthDefault').forEach(toggleCheckBox);
 });
 
 // Open all internal url's in dialog
-function loadView(url) {
-  var view = url.split('/').pop().split("?")[0];
-  if (view != '') {
-    var requestUrl = '/views/' + url.split('/').pop();
+function loadView(urlStr) {
+  let url = new URL(urlStr);
+  let isViewUrl = url.pathname.includes('/views/');
+
+  let windowUrl = new URL(window.location);
+  let oldParams = window.viewParams ?? [];
+  //delete any url params from old view
+  for(p of oldParams) {
+    windowUrl.searchParams.delete(p);
+  }
+
+  // add requested params
+  for([key, val] of windowUrl.searchParams.entries()) {
+    if(!url.searchParams.has(key))
+      url.searchParams.set(key, val);
+  }
+
+  if(isViewUrl) {
     $("#td-modal-content").html('<img src="/images/spinner.gif" style="max-width: 100%; max-height: 100px; margin-top: 40px; margin-left: auto; margin-right: auto; display: block;"/>');
     $("#td-modal-title").text('');
     $("#td-modal").show();
-    $("#td-modal-content").load(requestUrl, {'modal': true},
+    $("#td-modal-content").load(url.toString(), {'modal': true},
       function() {
-        history.replaceState(null, "", requestUrl);
+        history.replaceState(null, "", url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
         var title = $('#td-modal-content title').text();
         $("#td-modal-title").text(title);
 
@@ -57,143 +71,377 @@ function loadView(url) {
       }
     );
   }
+  else {
+    history.replaceState(null, "", url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
+  }
 }
+
 jQuery(document).ready(function ($) {
   $(".tdlink").bind('click', function(e) {
     loadView(this.href);
     e.preventDefault();
   });
+  $(".tdlink-sb").bind('click', function(e) {
+    window.sidebar.close();
+    e.preventDefault();
+  });
 });
+
 
 // Handle dialog close
 jQuery(document).ready(function ($) {
   $("#td-modal-close").bind('click', function(e) {
     $('#td-modal').hide();
-    history.replaceState(null, "", "/");
+    let url = new URL(window.location);
+    url.pathname = ""; //we are closing a view, clear the path
+
+    for(p of window.viewParams) { //clean up view specific url parameters
+      url.searchParams.delete(p);
+    }
+
+    history.replaceState(null, "", url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
   });
 });
 
 // Open station dialog if user clicked on station name
 jQuery(document).ready(function ($) {
   trackdirect.addListener("station-name-clicked", function (data) {
-    if (trackdirect.isImperialUnits()) {
-      loadView("/views/overview.php?id=" + data.station_id + "&imperialUnits=1");
-    } else {
-      loadView("/views/overview.php?id=" + data.station_id + "&imperialUnits=0");
+    let url = new URL(window.location);
+    url.searchParams.set("id", data.station_id);
+    url.pathname = "/views/overview.php";
+    loadView(url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
+  });
+});
+
+//handle time travel changed
+jQuery(document).ready(function ($) {
+  trackdirect.addListener("time-travel-changed", function (timestamp) {
+    let url = new URL(window.location);
+    if(timestamp <= 0) {
+      url.searchParams.delete('timetravel');
+      $('#right-container-timetravel').hide();
+      $('#timetravel-date').val('0');
+      $('#timetravel-time').val('0');
     }
+    else {
+      let datetime = moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm');
+      $('#right-container-timetravel-content').html('Time travel to ' + datetime);
+      $('#right-container-timetravel').show();
+
+      url.searchParams.set('timetravel', datetime);
+    }
+    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
+  });
+});
+
+//handle time length changed
+jQuery(document).ready(function ($) {
+  trackdirect.addListener("time-length-changed", function (timelength) {
+    let elementId = "time-" + timelength;
+    let anchor = document.getElementById(elementId);
+
+    if(anchor === undefined) {
+      trackdirect.setTimeLength(60);
+      return;
+    }
+
+    toggleCheckBoxSquare(anchor);
+
+    var url = new URL(window.location);
+    url.searchParams.set('time', timelength);
+    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
   });
 });
 
 // Update url when user moves map
 jQuery(document).ready(function ($) {
-  var newUrlTimeoutId = null;
   trackdirect.addListener("position-request-sent", function (data) {
-    if (newUrlTimeoutId !== null) {
-      clearTimeout(newUrlTimeoutId);
-    }
-
-    newUrlTimeoutId = window.setTimeout(function () {
       if ($("#td-modal").is(":hidden")) {
-        var url = window.location.href.split('/').pop();
+        let url = new URL(window.location);
+
         var newLat = Math.round(data.center.lat * 10000) / 10000;
         var newLng = Math.round(data.center.lng * 10000) / 10000;
         var newZoom = data.zoom;
 
-        if (!url.includes("center=")) {
-          if (!url.includes("?")) {
-            url += "?center=" + newLat + "," + newLng;
-          } else {
-            url += "&center=" + newLat + "," + newLng;
-          }
-        } else {
-          url = url.replace(/center=[^&]*/i, "center=" + newLat + "," + newLng);
-        }
+        url.searchParams.set('center',  + newLat + "," + newLng);
+        url.searchParams.set('zoom', newZoom);
 
-        if (!url.includes("zoom=")) {
-          if (!url.includes("?")) {
-            url += "?zoom=" + newZoom;
-          } else {
-            url += "&zoom=" + newZoom;
-          }
-        } else {
-          url = url.replace(/zoom=[^&]*/i, "zoom=" + newZoom);
-        }
-
-        history.replaceState(null, "", url);
-      }
-    }, 1000);
+        window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));//dirty hack to ensure we have , instead of %2C in the URL
+    }
   });
 });
 
 // Handle filter response
 jQuery(document).ready(function ($) {
   trackdirect.addListener("filter-changed", function (packets) {
+    let url = new URL(window.location);
     if (packets.length == 0) {
+      url.searchParams.delete('snamelist');
+      url.searchParams.delete('sid');
       // We are not filtering any more.
       $("#right-container-filtered").hide();
+      $('#td-filters-count').hide();
 
       // Time travel is stopped when filtering is stopped
       $("#right-container-timetravel").hide();
 
+      //clean up side bar
+      $('#td-sidebar-filtering').html("<h2>No Filters active</h2>");
+
       // Reset tail length to default when filtering is stopped
-      $("#tdTopnavTimelength>a").removeClass("dropdown-content-checkbox-active");
-      $("#tdTopnavTimelengthDefault").addClass("dropdown-content-checkbox-active");
       $(".dropdown-content-checkbox-only-filtering").addClass("dropdown-content-checkbox-hidden");
+      if(trackdirect.getTimeLength() > 360) trackdirect.setTimeLength(60);
     } else {
       var counts = {};
+      var ids = {};
+      
       for (var i = 0; i < packets.length; i++) {
         // Note that if related is set to 1, it is included since it is related to the station we are filtering on
         if (packets[i].related == 0) {
-          counts[packets[i]["station_name"]] =
-            1 + (counts[packets[i]["station_name"]] || 0);
+          counts[packets[i]["station_name"]] = 1 + (counts[packets[i]["station_name"]] || 0);
+          ids[packets[i]["station_name"]] = packets[i].station_id;
         }
       }
+
+      // handle filtered stations in side bar
+      var html = "<h2>Filtering on :</h2>\n";
+      Object.keys(counts).forEach(call => {
+        var curId = ids[call];
+        console.log(curId);
+        var otherids = Object.values(ids).filter(i__ => i__ != curId);
+        html += '<div class="clear-filter"><a href="#" onclick="trackdirect.filterOnStationId([' + otherids.join(",") + ']); return false";>&times;</a>&nbsp;&nbsp;' + call + '</div>\n';
+        console.log(html);
+      });
+      $('#td-sidebar-filtering').html(html);
+
+      // handle the number of filters badge
+      $('#td-filters-count').html(Object.keys(counts).length);
+      $('#td-filters-count').show();
+
+      let snamelist = Object.keys(counts).join(",");
+      url.searchParams.set('snamelist', snamelist);
+      url.searchParams.delete('sid'); // use names, more userfriendly than ids.
+
       $("#right-container-filtered-content").html(
         "Filtering on " + Object.keys(counts).length + " station(s)"
       );
       $("#right-container-filtered").show();
       $(".dropdown-content-checkbox-only-filtering").removeClass("dropdown-content-checkbox-hidden");
     }
+
+    window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
   });
 });
 
+// handle search field
+jQuery(document).ready(function ($) {
+  $('#station-search').keypress(function (e) {
+    if (e.which == 13) {
+        let q = $('#station-search').val();
+        let url = new URL(window.location);
+        url.pathname = "/views/search.php";
+        url.searchParams.set("q", q);
+        url.searchParams.set("seconds", 0);
+        loadView(url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
+        window.sidebar.close();
+    }
+  });
+});
+
+// handle locator field
+jQuery(document).ready(function ($) {
+  $('#qra-locator').keypress(function (e) {
+    if (e.which == 13) {
+        let value = $('#qra-locator').val().toString();
+        if(value.trim() != '') {
+          if(!window.trackdirect.setCenterLocator(value))
+            window.alert(value + " is not a valid QRA Locator.");
+          if(value.length >= 10) {
+            $('#qra-locator').val(value.slice(0, 8).toUpperCase() + value.slice(-2).toLowerCase());
+          }
+          else {
+            $('#qra-locator').val(value.toUpperCase());
+          }
+        }
+    }
+  });
+});
 
 function setMapType(value) {
+    var isGray = document.querySelector('.grayscale-tiles') !== null;
     trackdirect.setMapType(value)
     const url = new URL(window.location);
-    url.searchParams.set('maptype', value);
+    if(value != 'roadmap')
+      url.searchParams.set('maptype', value);
+    else
+      url.searchParams.delete('maptype');
     window.history.pushState({}, '', url);
+    setGrayscaleMode(isGray);
 }
 
 function setGrayscaleMode(enabled) {
-    // Cherche tous les conteneurs de tiles providers
-    var allTileContainers = document.querySelectorAll('.grayscale-tiles, .grayscale-tiles-dummy');
+  // Cherche tous les conteneurs de tiles providers
+  var allTileContainers = document.querySelectorAll('.grayscale-tiles, .grayscale-tiles-dummy');
 
-    if (enabled === undefined) {
-        // Détecte l'état courant : s'il y a au moins un .grayscale-tiles, c'est en gris, sinon couleur
-        var isGray = document.querySelector('.grayscale-tiles') !== null;
-        enabled = !isGray;
-    }
+  if (enabled === undefined) {
+    // Détecte l'état courant : s'il y a au moins un .grayscale-tiles, c'est en gris, sinon couleur
+    var isGray = document.querySelector('.grayscale-tiles') !== null;
+    enabled = !isGray;
+  }
 
-    allTileContainers.forEach(function(container) {
-        if (enabled) {
-            container.classList.remove('grayscale-tiles-dummy');
-            container.classList.add('grayscale-tiles');
-        } else {
-            container.classList.remove('grayscale-tiles');
-            container.classList.add('grayscale-tiles-dummy');
-        }
+  allTileContainers.forEach(function(container) {
+      if (enabled) {
+          container.classList.remove('grayscale-tiles-dummy');
+          container.classList.add('grayscale-tiles');
+      } else {
+          container.classList.remove('grayscale-tiles');
+          container.classList.add('grayscale-tiles-dummy');
+      }
+  });
+
+  // Gestion du paramètre d'URL
+  var url = new URL(window.location);
+  if (enabled) {
+      url.searchParams.set('grayscale', '1');
+  } else {
+      url.searchParams.delete('grayscale');
+  }
+  window.history.replaceState({}, '', url);
+}
+
+// Handle click on checkbox links
+jQuery(document).ready(function ($) {
+  document.querySelectorAll('.toggle-checkbox').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      toggleCheckBox(anchor, '.toggle-checkbox', 'fa-square', 'fa-check-square');
     });
+  });
 
-    // Gestion du paramètre d'URL
-    var url = new URL(window.location);
-    if (enabled) {
-        url.searchParams.set('grayscale', '1');
-    } else {
-        url.searchParams.delete('grayscale');
-    }
-    window.history.replaceState({}, '', url);
+  document.querySelectorAll('.toggle-checkbox-eye').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      toggleCheckBox(anchor, '.toggle-checkbox-eye', 'fa-eye', 'fa-eye-slash');
+    });
+  });
+});
+
+function toggleCheckBoxSquare(anchor) {
+  toggleCheckBox(anchor, '.toggle-checkbox', 'fa-square', 'fa-check-square');
+}
+
+function toggleCheckBoxEye(anchor) {
+  toggleCheckBox(anchor, '.toggle-checkbox-eye', 'fa-eye', 'fa-eye-slash');
+}
+
+function toggleCheckBox(anchor, cls, unchecked, checked) {
+  const icon = anchor.querySelector('i');
+  const group = anchor.dataset.group;
+
+  if (group) {
+    // Mode radio (une seule case cochée par groupe)
+    document.querySelectorAll(cls + '[data-group="' + group + '"]').forEach(other => {
+      const iconOther = other.querySelector('i');
+      iconOther.classList.remove(checked);
+      iconOther.classList.add(unchecked);
+    });
+    // Toujours cocher la case cliquée
+    icon.classList.remove(unchecked);
+    icon.classList.add(checked);
+  } else {
+    // Mode case isolée (toggle classique)
+    icon.classList.toggle(unchecked);
+    icon.classList.toggle(checked);
+  }
+}
+
+function setTimeLength(time, sendtoServer = true)
+{
+  // trackdirect.setTimeLength(time, sendtoServer);
+  // var url = new URL(window.location);
+  // url.searchParams.set('time', time);
+  // window.history.replaceState({}, '', url);
+}
+
+function toggleImperialUnits()
+{
+  trackdirect.toggleImperialUnits();
+  var url = new URL(window.location);
+  if(trackdirect.isImperialUnits())
+    url.searchParams.set('imperialUnits', 1);
+  else
+    url.searchParams.delete('imperialUnits');
+  window.history.replaceState({}, '', url);
+}
+
+function toggleCircles(anchor, rng = false)
+{
+  let state = 0;
+  if(rng) {
+    trackdirect.toggleRNGCircles();
+    state = trackdirect.getRNGCirclesState();
+  }
+  else {
+    trackdirect.togglePHGCircles();
+    state = trackdirect.getPHGCirclesState();
+  }
+  var url = new URL(window.location);
+
+  if(state != 0) {
+    url.searchParams.set(rng ? 'rng' : 'phg', state);
+  }
+  else {
+    url.searchParams.delete(rng ? 'rng' : 'phg');
+  }
+
+  window.history.replaceState({}, '', url);
+
+  const icon = anchor.querySelector('i');
+  icon.classList.remove('fas')
+  icon.classList.remove('far')
+  icon.classList.remove('fa-eye');
+  icon.classList.remove('fa-eye-slash');
+
+  switch(state)
+  {
+    case 0:
+      icon.classList.add('far');
+      icon.classList.add('fa-eye-slash');
+      break;
+    case 1:
+      icon.classList.add('far');
+      icon.classList.add('fa-eye');
+      break;
+    case 2:
+      icon.classList.add('fas');
+      icon.classList.add('fa-eye');
+      break;
+  }
 }
 
 
+function toggleStationaryStations()
+{
+  trackdirect.toggleStationaryPositions();
+  let url = new URL(window.location);
+  if(!trackdirect.getStationaryPositionsState()) {
+    url.searchParams.set('hidenotmoving', 1);
+  }
+  else {
+    url.searchParams.delete('hidenotmoving');
+  }
 
+  window.history.replaceState({}, '', url);
+}
+
+function toggleInternetStations()
+{
+  trackdirect.toggleInternetPositions();
+  let url = new URL(window.location);
+  if(!trackdirect.getInternetPositionsState()) {
+    url.searchParams.set('hideinternet', 1);
+  }
+  else {
+    url.searchParams.delete('hideinternet');
+  }
+
+  window.history.replaceState({}, '', url);
+}
