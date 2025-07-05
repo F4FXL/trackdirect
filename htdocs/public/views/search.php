@@ -61,7 +61,7 @@
                         <th>Latest heard</th>
                         <th>Comment/Other</th>
                         <th>Map</th>
-
+                        <th>Filter</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,7 +86,7 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if ($foundStation->latestConfirmedPacketTimestamp > (time() - 60*60*24)) : ?>
+                            <?php if (true) ://($foundStation->latestConfirmedPacketTimestamp > (time() - 60*60*24)) : ?>
                                 <a class="tdlink" href="/?sid=<?php echo $foundStation->id; ?>" onclick="
                                     if (window.parent && window.parent.trackdirect) {
                                         $('.modal', parent.document).hide();
@@ -97,6 +97,16 @@
                             <?php else : ?>
                                 &nbsp;
                             <?php endif; ?>
+                        </td>
+                        <td>
+                            <a class="tdlink" href="javascript:void(0);" onclick="
+                                if (window.parent && window.parent.trackdirect) {
+                                    let ids=window.parent.trackdirect.getFilterStationIds();
+                                    if(!ids.includes(<?php echo $foundStation->id; ?>))
+                                        ids.push(<?php echo $foundStation->id; ?>);
+                                    window.parent.trackdirect.filterOnStationId(ids);
+                                    return false;
+                                }">Add to filter</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

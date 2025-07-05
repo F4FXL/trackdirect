@@ -282,6 +282,10 @@ var trackdirect = {
     );
   },
 
+  getFilterStationIds: function () {
+    return this._map.state.getFilterStationIds().slice();
+  },
+
   /**
    * Filter on station by name
    * @return {array} stationNameArray
