@@ -23,18 +23,6 @@ User-agent: Yandex
 Disallow: /heatmaps/
 Disallow: /data/
 
-User-agent: Exabot
-Disallow: /heatmaps/
-Disallow: /data/
-
-User-agent: facebot
-Disallow: /heatmaps/
-Disallow: /data/
-
-User-agent: ia_archiver
-Disallow: /heatmaps/
-Disallow: /data/
-
 # Bloquer tous les autres robots
 User-agent: *
 Disallow: /
