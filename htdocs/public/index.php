@@ -32,6 +32,13 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
         <meta name="apple-mobile-web-app-capable" content="yes"/>
         <meta name="mobile-web-app-capable" content="yes">
 
+        <!-- No Sleep from https://github.com/richtr/NoSleep.js -->
+        <script src="/js/NoSleep.min.js"></script>
+        <script language="Javascript">
+            var sleepLockEnabled = false;
+            var noSleep = new NoSleep();
+        </script>
+
         <!-- JS libs used by this website (not a dependency for the track direct js lib) -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.5/mobile-detect.min.js" integrity="sha512-1vJtouuOb2tPm+Jh7EnT2VeiCoWv0d7UQ8SGl/2CoOU+bkxhxSX4gDjmdjmbX4OjbsbCBN+Gytj4RGrjV3BLkQ==" crossorigin="anonymous"></script>
         <script type="text/javascript" src="//www.gstatic.com/charts/loader.js"></script>
@@ -447,6 +454,15 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                     <h1 class="sidebar-header">Settings</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="toggleImperialUnits();" class="toggle-checkbox"><i class="far <?php echo $imperialunits == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Imperial Units</a></p>
+                    <p><a role="checkbox" href="javascript:void(0);" onclick="  if(sleepLockEnabled) {
+                                                                                    sleepLockEnabled = false;
+                                                                                    noSleep.disable();
+                                                                                }
+                                                                                else {
+                                                                                    sleepLockEnabled = true;
+                                                                                    noSleep.enable();
+                                                                                }" 
+                        class="toggle-checkbox"><i class="far fa-square"></i>&nbsp;&nbsp;Keep screen on</a></p>
                 </div>
             </div>
         </div>
