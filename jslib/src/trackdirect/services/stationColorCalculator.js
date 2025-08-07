@@ -47,12 +47,13 @@ _colors: [
   getColorId: function (packet) {
     let colorId;
     if (packet.station_name in this._stationColorId) {
-      // This station has allready got a color, use it
+      // This station has already got a color, use it
       colorId = this._stationColorId[packet.station_name];
       return colorId;
     } else {
       let hash = this._simplehashStr(packet.station_name);
-      colorId = hash % this._colors.length;
+      colorId = Math.abs(hash) % this._colors.length;
+      console.log("Hash " + hash + " Id " + colorId);
       this._stationColorId[packet.station_name] = colorId;
     }
 
@@ -66,10 +67,16 @@ _colors: [
    */
   _simplehashStr: function (str) {
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      let charCode = str.charCodeAt(i);
-      hash += charCode;
+    for (const char of str) {
+      hash = (hash << 5) - hash + char.charCodeAt(0);
+      hash |= 0; // Constrain to 32bit integer
     }
     return hash;
+    // let hash = 0;
+    // for (let i = 0; i < str.length; i++) {
+    //   let charCode = str.charCodeAt(i);
+    //   hash += (i % 2 == 0) ? (~charCode) : charCode;
+    // }
+    // return hash;
   },
 };
