@@ -97,7 +97,7 @@ class PacketDuplicatePolicy:
         if not packet.raw:
             return None
 
-        packet_string = packet.raw.split(':', 1)[1]
+        packet_string = f"{packet.raw.split('>', 1)[0]}:{packet.raw.split(':', 1)[1]}"
         if not packet_string:
             return None
         return hash(packet_string.strip())
