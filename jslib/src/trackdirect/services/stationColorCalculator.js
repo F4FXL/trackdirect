@@ -72,11 +72,5 @@ _colors: [
       hash |= 0; // Constrain to 32bit integer
     }
     return hash;
-    // let hash = 0;
-    // for (let i = 0; i < str.length; i++) {
-    //   let charCode = str.charCodeAt(i);
-    //   hash += (i % 2 == 0) ? (~charCode) : charCode;
-    // }
-    // return hash;
   },
 };
