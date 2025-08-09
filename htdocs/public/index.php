@@ -438,7 +438,7 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
                     <p>Type a station name and hit enter or use the advanced search below.</p><p><input type="text" id="station-search" style="width: 100%" placeholder="Search..."></p>
                     <hr>
-                    <p><a href="/views/search.php" class="tdlink tdlink-sb"><i class="fas fa-search-plus"></i>&nbsp;&nbsp;Advancded Search</a></p>
+                    <p><a href="/views/search.php" class="tdlink tdlink-sb"><i class="fas fa-search-plus"></i>&nbsp;&nbsp;Advanced Search</a></p>
                 </div>
                 <div class="sidebar-pane" id="sb-filtering">
                     <h1 class="sidebar-header">Filtering</h1>
