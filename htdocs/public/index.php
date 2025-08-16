@@ -122,9 +122,9 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
 
                 options['filters'] = {};
                 options['filters']['sid'] = "<?php echo $safe_GET['sid'] ?? '' ?>";         // Station id to filter on
-                options['filters']['sname'] = "<?php echo $safe_GET['sname'] ?? '' ?>";     // Station name to filter on
+                options['filters']['sname'] = "<?php echo strtoupper($safe_GET['sname'] ?? '') ?>";     // Station name to filter on
                 options['filters']['sidlist'] = "<?php echo $safe_GET['sidlist'] ?? '' ?>";     // Station id list to filter on (colon separated)
-                options['filters']['snamelist'] = "<?php echo $safe_GET['snamelist'] ?? '' ?>"; // Station name list to filter on (colon separated)
+                options['filters']['snamelist'] = "<?php echo strtoupper($safe_GET['snamelist'] ?? '') ?>"; // Station name list to filter on (colon separated)
 
                 // Tell jslib which html element to use to show connection status and mouse coordinates
                 options['statusContainerElementId'] = 'status-container';
