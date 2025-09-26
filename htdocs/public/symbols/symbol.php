@@ -2,7 +2,6 @@
 header('Access-Control-Allow-Origin: *');
 header("Cache-Control: max-age=2592000"); //30days (60sec * 60min * 24hours * 30days)
 
-
 // Contains ascii values that corresponds to symbols with overlay support (for symbols in the alternative table)
 $alternativeSymbolWithOverlaySupport = [33, 35, 37, 38, 39, 45, 62, 64, 79, 87, 91, 95, 97, 115, 122, 48, 65, 68, 69, 72, 94, 99, 105, 110,  117, 118];
 
@@ -125,6 +124,7 @@ if (isset($_GET['symbol']) && isset($_GET['symbol_table'])) {
 
             $filepath1 = './svgicons/' . $symbol . '-' . $symbolTable . '.svg';
             $filepath2 = './svgicons/' . $symbol . '-' . '3.svg';
+
             if (file_exists($filepath1)) {
                 $symbolCategory = $symbolTable;
             } else if (file_exists($filepath2)) {
@@ -436,7 +436,7 @@ if (isset($_GET['format']) && $_GET['format'] == 'png') {
     }
 
     $im->setBackgroundColor(new ImagickPixel('transparent'));
-    $im->readImageBlob($svgContent);
+    $im->readImageBlob($svgContent, 'svg');
     $im->setImageFormat("png32");
 
     // echo $_SERVER['REQUEST_URI'];
