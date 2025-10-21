@@ -35,7 +35,7 @@ class PDOConnection
                         $databaseconfig['password']
                     ), null, null,
                     array(
-                        PDO::ATTR_PERSISTENT => false,
+                        PDO::ATTR_PERSISTENT => true,
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
                     )
                 );
