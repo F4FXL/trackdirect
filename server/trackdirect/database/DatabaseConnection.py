@@ -1,3 +1,4 @@
+import threading
 import logging
 import psycopg2
 import psycopg2.extras
@@ -6,6 +7,10 @@ from server.trackdirect.TrackDirectConfig import TrackDirectConfig
 class DatabaseConnection:
     """The DatabaseConnection class handles the most basic communication with the database."""
 
+    _lock = threading.Lock()
+    db = None
+    db_no_autocommit = None
+    
     def __init__(self):
         """Initialize the DatabaseConnection with configuration parameters."""
         config = TrackDirectConfig()
@@ -18,8 +23,7 @@ class DatabaseConnection:
         self.username = config.db_username
         self.password = config.db_password
         self.port = config.db_port
-        self.db = None
-        self.db_no_autocommit = None
+
 
     def get_connection(self, autocommit=True, create_new_connection=False, app_name = 'trackdirect_py'):
         """Returns a connection to the database.
@@ -35,13 +39,25 @@ class DatabaseConnection:
             return self._create_new_connection(autocommit, app_name)
 
         if autocommit:
-            if self.db is None:
-                self.db = self._create_new_connection(True, app_name)
-            return self.db
+            # Fast path without lock
+            conn = DatabaseConnection.db
+            if conn is not None:
+                return conn
+            # critical section
+            with DatabaseConnection._lock:
+                if DatabaseConnection.db is None:
+                    DatabaseConnection.db = self._create_new_connection(True, app_name)
+                return DatabaseConnection.db
 
-        if self.db_no_autocommit is None:
-            self.db_no_autocommit = self._create_new_connection(False, app_name)
-        return self.db_no_autocommit
+        # Non-autocommit
+        conn = DatabaseConnection.db_no_autocommit
+        if conn is not None:
+            return conn
+        # critical section
+        with DatabaseConnection._lock:
+            if DatabaseConnection.db_no_autocommit is None:
+                DatabaseConnection.db_no_autocommit = self._create_new_connection(False, app_name)
+            return DatabaseConnection.db_no_autocommit
 
     def _create_new_connection(self, autocommit, app_name):
         """Creates a new connection to the database.
