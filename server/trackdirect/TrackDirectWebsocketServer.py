@@ -28,7 +28,7 @@ class TrackDirectWebsocketServer(WebSocketServerProtocol):
         self.max_client_idle_time = None
 
         db_connection = DatabaseConnection()
-        db = db_connection.get_connection(True)
+        db = db_connection.get_connection(True, False, 'trackdirect_websocketsrv_py')
 
         self.connection_state = WebsocketConnectionState()
         self.response_creator = WebsocketResponseCreator(self.connection_state, db)

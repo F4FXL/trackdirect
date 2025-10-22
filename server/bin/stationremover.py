@@ -43,7 +43,7 @@ if __name__ == '__main__':
         track_direct_logger.info("Starting")
 
         trackDirectDb = DatabaseConnection()
-        db = trackDirectDb.get_connection(True)
+        db = trackDirectDb.get_connection(True, False, 'trackdirect_station_remover')
         db.set_session(autocommit=True)
         cursor = db.cursor()
         cursor.execute("SET statement_timeout = '120s'")

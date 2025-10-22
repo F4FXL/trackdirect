@@ -74,8 +74,8 @@ class TrackDirectDataCollector:
         config.populate(config_file)
 
         db_connection = DatabaseConnection()
-        self.db = db_connection.get_connection(True)
-        self.db_no_auto_commit = db_connection.get_connection(False)
+        self.db = db_connection.get_connection(True, False, 'trackdirect_collector_auto_commit')
+        self.db_no_auto_commit = db_connection.get_connection(False, False, 'trackdirect_collector_NO_auto_commit')
         self.station_repository = StationRepository(self.db)
 
         threads.deferToThread(self.consume)

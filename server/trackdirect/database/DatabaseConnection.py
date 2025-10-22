@@ -21,7 +21,7 @@ class DatabaseConnection:
         self.db = None
         self.db_no_autocommit = None
 
-    def get_connection(self, autocommit=True, create_new_connection=False):
+    def get_connection(self, autocommit=True, create_new_connection=False, app_name = 'trackdirect_py'):
         """Returns a connection to the database.
 
         Args:
@@ -32,18 +32,18 @@ class DatabaseConnection:
             psycopg2.Connection: The database connection.
         """
         if create_new_connection:
-            return self._create_new_connection(autocommit)
+            return self._create_new_connection(autocommit, app_name)
 
         if autocommit:
             if self.db is None:
-                self.db = self._create_new_connection(autocommit)
+                self.db = self._create_new_connection(autocommit, app_name)
             return self.db
 
         if self.db_no_autocommit is None:
-            self.db_no_autocommit = self._create_new_connection(autocommit)
+            self.db_no_autocommit = self._create_new_connection(autocommit, app_name)
         return self.db_no_autocommit
 
-    def _create_new_connection(self, autocommit):
+    def _create_new_connection(self, autocommit, app_name):
         """Creates a new connection to the database.
 
         Args:
@@ -59,7 +59,8 @@ class DatabaseConnection:
             password=self.password,
             port=self.port,
             sslmode='disable',
-            cursor_factory=psycopg2.extras.DictCursor
+            cursor_factory=psycopg2.extras.DictCursor,
+            application_name=app_name  
         )
         connection.autocommit = autocommit
         return connection
