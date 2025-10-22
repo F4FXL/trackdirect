@@ -29,6 +29,7 @@ class TrackDirectWebsocketServer(WebSocketServerProtocol):
 
         db_connection = DatabaseConnection()
         db = db_connection.get_connection(True, False, 'trackdirect_websocketsrv_py')
+        self._db = db
 
         self.connection_state = WebsocketConnectionState()
         self.response_creator = WebsocketResponseCreator(self.connection_state, db)
@@ -100,6 +101,7 @@ class TrackDirectWebsocketServer(WebSocketServerProtocol):
             self.connection_state.disconnected = True
             self._stop_timestamp_sender()
             self._stop_real_time_listener(True)
+            self._db.close()
         except Exception as e:
             self.logger.error(e, exc_info=True)
 
