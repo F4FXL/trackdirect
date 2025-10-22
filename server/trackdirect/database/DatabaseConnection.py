@@ -36,11 +36,11 @@ class DatabaseConnection:
 
         if autocommit:
             if self.db is None:
-                self.db = self._create_new_connection(autocommit, app_name)
+                self.db = self._create_new_connection(True, app_name)
             return self.db
 
         if self.db_no_autocommit is None:
-            self.db_no_autocommit = self._create_new_connection(autocommit, app_name)
+            self.db_no_autocommit = self._create_new_connection(False, app_name)
         return self.db_no_autocommit
 
     def _create_new_connection(self, autocommit, app_name):
