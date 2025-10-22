@@ -62,7 +62,7 @@ services:
       POSTGRES_PASSWORD: foobar
       POSTGRES_DB: trackdirect
     volumes:
-      - $PWD/db:/var/lib/postgresql/data
+      - $PWD/db:/var/lib/postgresql/18/docker
     command: -c config_file=/etc/postgresql.conf
     #ports:
     #  - "5432:5432"
