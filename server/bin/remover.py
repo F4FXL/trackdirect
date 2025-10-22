@@ -60,8 +60,8 @@ def main():
 
     try:
         track_direct_db = DatabaseConnection()
-        db_no_auto_commit = track_direct_db.get_connection(False)
-        db = track_direct_db.get_connection(True)
+        db_no_auto_commit = track_direct_db.get_connection(False, False, "trackedirect_remover_NO_auto_commit")
+        db = track_direct_db.get_connection(True, False, "trackedirect_remover_auto_commit")
         db.set_isolation_level(0)
         cursor = db.cursor()
         cursor.execute("SET statement_timeout = '240s'")

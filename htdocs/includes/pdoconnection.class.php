@@ -1,164 +1,135 @@
 <?php
 
-class PDOConnection
+final class PDOConnection
 {
+    private static ?PDOConnection $_instance = null;
 
-    private static $_singletonInstance = null;
-    private $_db;
-    private $_config;
+    /** @var ?PDO */
+    private ?PDO $_db = null;
+    /** @var array */
+    private array $_config = [];
 
-    public function __construct()
+    private function __construct()
     {
-        $this->_config = parse_ini_file(ROOT . '/../config/trackdirect.ini', true);
+        $cfg = parse_ini_file(ROOT . '/../config/trackdirect.ini', true);
+        if (!is_array($cfg) || !isset($cfg['database'])) {
+            throw new RuntimeException('Failed to parse database ini file.');
+        }
+        $this->_config = $cfg['database'];
+        if (!isset($this->_config['username'])) {
+            $this->_config['username'] = get_current_user();
+        }
+        // Valeurs par défaut sûres
+        $this->_config += [
+            'host'     => 'localhost',
+            'port'     => '5432',
+            'password' => '',
+            'database' => '',
+        ];
     }
 
-    /**
-     * Connect to the database.
-     */
-    private function createConnection()
+    public static function getInstance(): PDOConnection
     {
-        if (is_array($this->_config) && isset($this->_config['database'])) {
-            $databaseconfig = $this->_config['database'];
+        // Suffisant en PHP-FPM/Apache (par requête/processus)
+        if (self::$_instance === null) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
+    }
 
-            if (!isset($databaseconfig['username'])) {
-                $databaseconfig['username'] = get_current_user();
-            }
+    // Interdire clone/unserialize
+    private function __clone() {}
+    public function __wakeup() { throw new RuntimeException('Cannot unserialize singleton'); }
 
-            try {
-                $this->_db = new PDO(
-                    sprintf(
-                        'pgsql:dbname=%s;host=%s;port=%s;user=%s;password=%s',
-                        $databaseconfig['database'],
-                        $databaseconfig['host'],
-                        $databaseconfig['port'],
-                        $databaseconfig['username'],
-                        $databaseconfig['password']
-                    ), null, null,
-                    array(
-                        PDO::ATTR_PERSISTENT => true,
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-                    )
-                );
-            } catch (PDOException $e) {
-                echo $e;
-                throw new Exception("Failed to connect to database.");
-            }
-        } else {
-            throw new Exception("Failed to parse database ini file.");
+    private function createConnection(): void
+    {
+        if ($this->_db !== null) {
+            return;
+        }
+
+        $dsn = sprintf(
+            'pgsql:dbname=%s;host=%s;port=%s;application_name=%s',
+            $this->_config['database'],
+            $this->_config['host'],
+            $this->_config['port'],
+            rawurlencode($this->_config['application_name'] ?? 'trackdirect-php')
+        );
+
+        try {
+            $this->_db = new PDO(
+                $dsn,
+                $this->_config['username'],
+                $this->_config['password'],
+                [
+                    PDO::ATTR_PERSISTENT         => false, // pas de connexions persistantes
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]
+            );
+        } catch (PDOException $e) {
+            // Log détaillé côté serveur, message générique côté appli
+            error_log('DB connect error: ' . $e->getMessage());
+            throw new RuntimeException('Failed to connect to database.');
         }
     }
 
-    /**
-     * Returnes a PDO db connection
-     *
-     * @return PDO
-     */
-    private function getConnection()
+    private function getConnection(): PDO
     {
-        if($this->_db === null) {
+        if ($this->_db === null) {
             $this->createConnection();
         }
-
         return $this->_db;
     }
 
-    /**
-     * Executes an SQL statement, returning a result set as a PDOStatement object
-     *
-     * @param  string $sql
-     * @return PDOStatement
-     */
-    public function query($sql)
+    public function query(string $sql): PDOStatement
     {
         return $this->getConnection()->query($sql);
     }
 
-    /**
-     * Prepares a statement for execution and returns a statement object
-     *
-     * @param  string $sql
-     * @return PDOStatement
-     */
-    public function prepare($sql)
+    public function prepare(string $sql): PDOStatement
     {
         return $this->getConnection()->prepare($sql);
     }
 
-    /**
-     * Prepares a statement for execution and execute the prepared statement. Returnes the statment object
-     *
-     * @param  string $sql
-     * @param  array  $arguments
-     * @return PDOStatement
-     */
-    public function prepareAndExec($sql, array $arguments = array())
+    public function prepareAndExec(string $sql, array $arguments = []): PDOStatement
     {
-        $statement = $this->prepare($sql);
-        $statement->execute($arguments);
-        return $statement;
+        $stmt = $this->prepare($sql);
+        $stmt->execute($arguments);
+        return $stmt;
     }
 
-    /**
-     * Initiates a transaction. Turns off autocommit mode. Returns TRUE on success or FALSE on failure.
-     *
-     * @return boolean
-     */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
-        $this->getConnection()->beginTransaction();
+        return $this->getConnection()->beginTransaction();
     }
 
-    /**
-     * Commits a transaction. Returns TRUE on success or FALSE on failure.
-     *
-     * @return boolean
-     */
-    public function commit()
+    public function commit(): bool
     {
-        $this->getConnection()->commit();
+        return $this->getConnection()->commit();
     }
 
-    /**
-     * Rolls back the current transaction (that was started by beginTransaction). Returns TRUE on success or FALSE on failure.
-     *
-     * @return boolean
-     */
-    public function rollBack()
+    public function rollBack(): bool
     {
-        $this->getConnection()->rollBack();
+        return $this->getConnection()->rollBack();
     }
 
-    /**
-     * Get the ID of the last inserted record.
-     *
-     * @param  string $table
-     * @param  string $column
-     * @return int
-     */
-    public function lastInsertId($table, $column)
+    public function lastInsertId(string $table, string $column): string|false
     {
         $suffix = '_' . $column . '_seq';
-
-        /* The max length of an identifier is 63 characters,
-         * if table_column_seq exceeds this postgres cuts the
-         * table name by default. */
-        $table = substr($table, 0, 63 - (strlen($suffix)));
-        $sequenceName = $table . $suffix;
-
-        return $this->getConnection()->lastInsertId($sequenceName);
+        $table  = substr($table, 0, 63 - strlen($suffix));
+        $seq    = $table . $suffix;
+        return $this->getConnection()->lastInsertId($seq);
     }
 
-    /**
-     * Returnes an initiated PDOConnection
-     *
-     * @return PDOConnection
-     */
-    public static function getInstance()
+    /** Fermer explicitement la connexion */
+    public function close(): void
     {
-        if (self::$_singletonInstance === null) {
-            self::$_singletonInstance = new PDOConnection();
-        }
+        $this->_db = null; // libère la connexion PDO
+    }
 
-        return self::$_singletonInstance;
+    public function __destruct()
+    {
+        // Sécurité : s’assure que la connexion est fermée en fin de vie
+        $this->close();
     }
 }

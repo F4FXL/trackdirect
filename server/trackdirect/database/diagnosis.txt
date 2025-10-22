@@ -1,0 +1,18 @@
+SELECT coalesce(application_name,'(none)') AS app,
+       usename,
+       client_addr,
+       state,
+       count(*) AS n
+FROM pg_stat_activity
+WHERE backend_type = 'client backend'
+GROUP BY 1,2,3,4
+ORDER BY n DESC;
+
+-- Voir l'ancienneté des sessions "idle"
+SELECT pid, client_addr, application_name, state,
+       now() - backend_start AS age,
+       state_change,
+       query
+FROM pg_stat_activity
+WHERE state = 'idle'
+ORDER BY backend_start;

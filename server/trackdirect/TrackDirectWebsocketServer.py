@@ -17,6 +17,7 @@ from server.trackdirect.websocket.aprsis.AprsISPayloadCreator import AprsISPaylo
 
 class TrackDirectWebsocketServer(WebSocketServerProtocol):
     """The TrackDirectWebsocketServer class handles the incoming requests."""
+    
 
     def __init__(self):
         """Initialize the TrackDirectWebsocketServer."""
@@ -28,7 +29,7 @@ class TrackDirectWebsocketServer(WebSocketServerProtocol):
         self.max_client_idle_time = None
 
         db_connection = DatabaseConnection()
-        db = db_connection.get_connection(True)
+        db = db_connection.get_connection(True, False, f"trackdirect_websocketsrv_py pid {os.getpid()}")
 
         self.connection_state = WebsocketConnectionState()
         self.response_creator = WebsocketResponseCreator(self.connection_state, db)
@@ -49,15 +50,16 @@ class TrackDirectWebsocketServer(WebSocketServerProtocol):
 
             self.max_client_idle_time = int(config.max_client_idle_time) * 60
             self.max_queued_realtime_packets = int(config.max_queued_realtime_packets)
+            self.clientinfo =  f"None - {os.getpid()}"
 
             if 'x-forwarded-for' in request.headers:
-                self.logger.warning(
-                    f"Client connecting from origin: {request.origin}, x-forwarded-for: {request.headers['x-forwarded-for']} (server pid {os.getpid()})"
-                )
+                self.clientinfo = f"{request.origin}, x-forwarded-for: {request.headers['x-forwarded-for']} (server pid {os.getpid()})"
             else:
-                self.logger.warning(
-                    f"Client connecting from origin: {request.origin} (server pid {os.getpid()})"
-                )
+                self.clientinfo = f"{request.origin} (server pid {os.getpid()})"
+
+            self.logger.warning(
+                f"Client connecting from origin: {self.clientinfo})"
+            )
         except Exception as e:
             self.logger.error(e, exc_info=True)
             raise
@@ -96,7 +98,7 @@ class TrackDirectWebsocketServer(WebSocketServerProtocol):
     def onClose(self, was_clean, code, reason):
         """Executed on close."""
         try:
-            self.logger.info(f"WebSocket connection closed: {reason}")
+            self.logger.info(f"WebSocket connection closed: {reason} - Code {code} - Clean {was_clean} - {self.clientinfo}")
             self.connection_state.disconnected = True
             self._stop_timestamp_sender()
             self._stop_real_time_listener(True)
