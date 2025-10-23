@@ -56,7 +56,7 @@ trackdirect.services.symbolPathFinder = {
       courseStrValue +
       sizeStrValue +
       scaleStrValue +
-      ".png";
+      ".svg";
 
     return trackdirect.settings.baseUrl + url;
   },
