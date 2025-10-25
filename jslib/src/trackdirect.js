@@ -36,6 +36,8 @@ var trackdirect = {
   _mapCreated: false,
   _trackdirectInitDone: false,
 
+  _coverageType: 'movingonly',
+
   isMobile: false,
   coverageDataUrl: null,
   coveragePercentile: 95,
@@ -518,16 +520,67 @@ var trackdirect = {
    * @param {int} stationId
    * @param {string} coverageLinkElementClass
    */
-  toggleStationCoverage: function (stationId, coverageLinkElementClass) {
-    coverageLinkElementClass =
+  toggleStationCoverage: function (stationId, isUserInput) {
+    this._map.state.openInfoWindow?.UpdateCoverageLink("begin", isUserInput);
+    var coveragePolygon = this._map.markerCollection.getStationCoverage(stationId);
+    
+    if(coveragePolygon !== null && coveragePolygon.isRequestedToBeVisible()) {
+        coveragePolygon.hide();
+        this._map.markerCollection.addStationCoverage(stationId, null);
+        this._map.state.openInfoWindow?.UpdateCoverageLink("hidden", isUserInput);
+    }
+    else {
+      var packet = this._map.markerCollection.getStationLatestPacket(stationId);
+      var center = {
+        lat: parseFloat(packet.latitude),
+        lng: parseFloat(packet.longitude),
+      };
+      
+      var coveragePolygon = new trackdirect.models.StationCoveragePolygon(center, this._map, true);
+      coveragePolygon.showWhenDone();
+
+      var me = this;
+      coveragePolygon.addTdListener(
+        "visible",
+        function () {
+          if (!coveragePolygon.hasContent()) {
+            coveragePolygon.hide();
+            me._map.state.openInfoWindow?.UpdateCoverageLink("not-enough-data", isUserInput);
+          } else {
+            me._map.state.openInfoWindow?.UpdateCoverageLink("shown", isUserInput);
+          }
+        },
+        true
+      );
+
+      $.getJSON(this.coverageDataUrl + "?id=" + stationId + "&coveragetype=" + this._coverageType,
+        function (data) {
+          if ("station_id" in data && "coverage" in data) {
+            coveragePolygon.setData(data["coverage"], me.coveragePercentile);
+            var marker = me._map.markerCollection.getStationLatestMarker(stationId);
+            if (marker.isVisible()) {
+              if (coveragePolygon.isRequestedToBeVisible()) {
+                me._map.markerCollection.addStationCoverage(stationId, coveragePolygon);
+                coveragePolygon.show();
+              }
+            }
+          }
+        }).fail(function () {
+          coveragePolygon.hide();
+          this._map.markerCollection.addStationCoverage(stationId, null);
+          me._map.state.openInfoWindow?.UpdateCoverageLink("load-failed", isUserInput);
+        })
+        .always(function () { });
+    }
+    /*coverageLinkElementClass =
       typeof coverageLinkElementClass !== "undefined"
         ? coverageLinkElementClass
         : null;
 
-    var coveragePolygon =
-      this._map.markerCollection.getStationCoverage(stationId);
+    var coveragePolygon = this._map.markerCollection.getStationCoverage(stationId);
     if (coveragePolygon !== null && coveragePolygon.isRequestedToBeVisible()) {
       coveragePolygon.hide();
+      this._map.markerCollection.addStationCoverage(stationId, null);
       if (coverageLinkElementClass !== null) {
         $("." + coverageLinkElementClass).html("Coverage");
       }
@@ -571,9 +624,7 @@ var trackdirect = {
             function () {
               if (!coveragePolygon.hasContent()) {
                 coveragePolygon.hide();
-                alert(
-                  "Currently we do not have enough data to create a max range coverage plot for this station. Try again later!"
-                );
+                alert("Currently we do not have enough data to create a max range coverage plot for this station. Try again later!");
                 $("." + coverageLinkElementClass).html("Coverage");
               } else {
                 $("." + coverageLinkElementClass).html("Hide coverage");
@@ -584,24 +635,40 @@ var trackdirect = {
         }
 
         var me = this;
-        $.getJSON(this.coverageDataUrl + "?id=" + stationId, function (data) {
+        $.getJSON(this.coverageDataUrl + "?id=" + stationId + "&coveragetype=" + this._coverageType , function (data) {
           if ("station_id" in data && "coverage" in data) {
             coveragePolygon.setData(data["coverage"], me.coveragePercentile);
-            var marker =
-              me._map.markerCollection.getStationLatestMarker(stationId);
+            var marker = me._map.markerCollection.getStationLatestMarker(stationId);
             if (marker.isVisible()) {
               if (coveragePolygon.isRequestedToBeVisible()) {
                 coveragePolygon.show();
               }
             }
           }
-        })
-          .fail(function () {
+        }).fail(function () {
             coveragePolygon.hide();
             alert("Failed to fetch coverage data. Try again later!");
             $("." + coverageLinkElementClass).html("Coverage");
           })
           .always(function () {});
+      }
+    }*/
+  },
+
+  /**
+   * Set coverage type
+   * @param {string} coverageType
+   * @return None
+   */
+  setCoverageType: function (coverageType) {
+    if(this._coverageType != coverageType) {
+      const ids = this._map.markerCollection.getStationCoverageIds();
+      
+      this._coverageType = coverageType;
+      
+      for(const stationId of ids) {
+        this.toggleStationCoverage(parseInt(stationId), false);
+        this.toggleStationCoverage(parseInt(stationId), false);
       }
     }
   },

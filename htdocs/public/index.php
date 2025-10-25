@@ -9,6 +9,7 @@ $rng = in_array((int)$safe_GET['rng'], [0, 1, 2]) ? (int)$safe_GET['rng'] : 0;
 $mapapi = in_array($safe_GET['mapapi'], ['google', 'leaflet']) ? $safe_GET['mapapi'] : 'leaflet';
 $hidenotmoving = $safe_GET['hidenotmoving'] == 1 ? 1 : 0;
 $hideinternet = $safe_GET['hideinternet'] == 1 ? 1 : 0;
+$coverage_type = in_array($safe_GET['coveragetype'], ["onlymoving", "all"]) ? $safe_GET['coveragetype'] : "onlymoving";
 
 $timetravel = "0";
 $timetravelday = "0";
@@ -229,6 +230,8 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                         trackdirect.addListener("map-created", function() {
                             //set grayscale once leaflet has been loaded
                             setGrayscaleMode(<?php echo $grayscale == 1 ? 'true' : 'false'; ?>);
+                            // set coverage type from urel
+                            setCoverageType('<?php echo $coverage_type;?>');
                             // set PHG from URL
                             trackdirect.setPHGCirclesState(<?php echo $phg; ?>);
                             // set RNG from URL
@@ -453,7 +456,8 @@ if(isValidDateInRange($safe_GET['timetravel'], (int)getConfig('database', 'days_
                 <div class="sidebar-pane" id="sb-settings">
                     <h1 class="sidebar-header">Settings</h1>
                     <div class="sidebar-close" role="button"><i class="fas fa-times"></i></a></div>
-                    <p><a role="checkbox" href="javascript:void(0);" onclick="toggleImperialUnits();" class="toggle-checkbox"><i class="far <?php echo $imperialunits == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Imperial Units</a></p>
+                    <p><a role="checkbox" href="javascript:void(0);" onclick="setCoverageType();" class="toggle-checkbox"><i class="far <?php echo $coverage_type == "onlymoving" ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Calculate coverage only from moving packets</a></p>
+                    <p><a role="checkbox" href="javascript:void(0);" onclick="toggleImperialUnits();" class="toggle-checkbox"><i class="far <?php echo $imperialunits == 1 ? "fa-check-square" : "fa-square"?>"></i>&nbsp;&nbsp;Imperial units</a></p>
                     <p><a role="checkbox" href="javascript:void(0);" onclick="  if(sleepLockEnabled) {
                                                                                     sleepLockEnabled = false;
                                                                                     noSleep.disable();

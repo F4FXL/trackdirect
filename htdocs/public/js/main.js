@@ -210,7 +210,6 @@ jQuery(document).ready(function ($) {
         console.log(curId);
         var otherids = Object.values(ids).filter(i__ => i__ != curId);
         html += '<div class="clear-filter"><a href="#" onclick="trackdirect.filterOnStationId([' + otherids.join(",") + ']); return false";>&times;</a>&nbsp;&nbsp;' + call + '</div>\n';
-        console.log(html);
       });
       $('#td-sidebar-filtering').html(html);
 
@@ -275,7 +274,7 @@ function setMapType(value) {
       url.searchParams.set('maptype', value);
     else
       url.searchParams.delete('maptype');
-    window.history.pushState({}, '', url);
+    window.history.pushState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
     setGrayscaleMode(isGray);
 }
 
@@ -306,7 +305,30 @@ function setGrayscaleMode(enabled) {
   } else {
       url.searchParams.delete('grayscale');
   }
-  window.history.replaceState({}, '', url);
+  window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
+}
+
+function setCoverageType(ctype)
+{
+  var url = new URL(window.location);
+
+  // nothing passed as parameter, read the url and toggle it
+  if(ctype === undefined) {
+    ctype = url.searchParams.has('coveragetype') ? url.searchParams.get('coveragetype') : 'onlymoving';
+    // toggle
+    ctype = (ctype == 'onlymoving' ? 'all' : 'onlymoving');
+  }
+
+  trackdirect.setCoverageType(ctype);
+
+  if(ctype == 'onlymoving') {
+    url.searchParams.delete('coveragetype');
+  }
+  else {
+    url.searchParams.set('coveragetype', 'all');
+  }
+
+  window.history.replaceState({}, '', url.toString().replaceAll("%2C", ",").replaceAll("%3A", ":"));
 }
 
 // Handle click on checkbox links
@@ -445,3 +467,4 @@ function toggleInternetStations()
 
   window.history.replaceState({}, '', url);
 }
+

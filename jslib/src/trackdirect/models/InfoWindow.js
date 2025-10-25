@@ -1399,9 +1399,7 @@ trackdirect.models.InfoWindow.prototype._getMenuDivCoverageLink = function () {
     "onclick",
     "trackdirect.toggleStationCoverage(" +
     this._marker.packet.station_id +
-    ', "' +
-    coverageLinkElementClass +
-    '"); return false;'
+    ', true); return false;'
   );
 
   let coveragePolygon = this._defaultMap.markerCollection.getStationCoverage(
@@ -1415,6 +1413,36 @@ trackdirect.models.InfoWindow.prototype._getMenuDivCoverageLink = function () {
   menuLi.append(menuLink);
   return menuLi;
 };
+
+/**
+ * Update Coverage Link
+ * @param {status} status of the coverage polygon
+ * @param {boolean} isUserInput, must be set to true if the user clicked on the link. 
+ */
+trackdirect.models.InfoWindow.prototype.UpdateCoverageLink = function (status, isUserInput) {
+    let coverageLinkElementClass =  "stationCoverageLink" + this._marker.packet.station_id;
+
+    if(status == "begin") {
+      $("." + coverageLinkElementClass).html(
+              'Loading <i class="fa fa-spinner fa-spin" style="font-size:12px"></i>'
+      );
+    }
+    if (status == "shown") {
+      $("." + coverageLinkElementClass).html("Hide coverage");
+    }
+    if (status == "hidden") {
+      $("." + coverageLinkElementClass).html("Coverage");
+    }
+    if (status == "not-enough-data") {
+      $("." + coverageLinkElementClass).html("Coverage");
+      if(isUserInput) alert("Currently we do not have enough data to create a max range coverage plot for this station. Try again later!");
+    }
+    if (status == "load-failed") {
+      $("." + coverageLinkElementClass).html("Coverage");
+      if(isUserInput) alert("Coverage Data load failed");
+    }
+}
+
 
 /**
  * Get the info window menu center link
