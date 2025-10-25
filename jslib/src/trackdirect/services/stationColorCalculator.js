@@ -53,7 +53,6 @@ _colors: [
     } else {
       let hash = this._simplehashStr(packet.station_name);
       colorId = Math.abs(hash) % this._colors.length;
-      console.log("Hash " + hash + " Id " + colorId);
       this._stationColorId[packet.station_name] = colorId;
     }
 

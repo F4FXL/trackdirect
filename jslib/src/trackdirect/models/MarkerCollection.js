@@ -292,7 +292,13 @@ trackdirect.models.MarkerCollection.prototype.addStationCoverage = function (
   stationId,
   stationCoveragePolygon
 ) {
-  this._stationCoverage[stationId] = stationCoveragePolygon;
+  if (stationCoveragePolygon != null) {
+    // ajout ou mise à jour
+    this._stationCoverage[stationId] = stationCoveragePolygon;
+  } else if (stationId in this._stationCoverage) {
+    // suppression si déjà présent
+    delete this._stationCoverage[stationId];
+  }
 };
 
 /**
@@ -311,6 +317,17 @@ trackdirect.models.MarkerCollection.prototype.getStationCoverage = function (
   }
   return null;
 };
+
+/**
+ * Returns the stationid for stations having a coverage
+ * @return {StationCoverageIds}
+ */
+trackdirect.models.MarkerCollection.prototype.getStationCoverageIds = function () {
+  return Object.keys(this._stationCoverage)
+    .filter(key => this._stationCoverage[key] != null)
+    .map(Number);
+}
+
 
 /**
  * Returns an array of stations the has a visible coverage
