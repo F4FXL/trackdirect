@@ -251,18 +251,11 @@ trackdirect.models.StationCoveragePolygon.prototype._leafletInit = function () {
     this._heatmapCoordinates !== null &&
     this._heatmapCoordinates.length > 0
   ) {
-    let data = [];
-    for (let i = 0; i < this._heatmapCoordinates.length; i++) {
-      data.push([
-        this._heatmapCoordinates[i].lat,
-        this._heatmapCoordinates[i].lng,
-        10,
-      ]);
-    }
+
     this._heatmap = L.heatLayer(this._heatmapCoordinates, {
-      minOpacity: 0.35,
-      radius: 6,
-      blur: 4,
+      minOpacity: 0.75,
+      radius: 10,
+      blur: 4
     });
   }
 };
@@ -453,10 +446,7 @@ trackdirect.models.StationCoveragePolygon.prototype._getCoordinates = function (
         parseFloat(data[j]["longitude"])
       );
     } else {
-      position = {
-        lat: parseFloat(data[j]["latitude"]),
-        lng: parseFloat(data[j]["longitude"]),
-      };
+      position = [data[j]["latitude"], data[j]["longitude"], data[j]["weight"]];
     }
     result.push(position);
   }

@@ -111,15 +111,38 @@ class PacketPathRepository extends ModelRepository
         }
         $minTimestamp = time() - (60*60*$hours);
 
-        $sql = 'select pp.*
-            from packet_path pp
-            where pp.station_id = ?
-                and pp.timestamp >= ?
-                and pp.number = 0
-                and pp.sending_latitude is not null
-                and pp.sending_longitude is not null
-            order by pp.timestamp
-            limit ?';
+        // $sql = 'select pp.*
+        //     from packet_path pp
+        //     where pp.station_id = ?
+        //         and pp.timestamp >= ?
+        //         and pp.number = 0
+        //         and pp.sending_latitude is not null
+        //         and pp.sending_longitude is not null
+        //     order by pp.timestamp
+        //     limit ?';
+               
+        $sql = 'SELECT *
+            FROM (
+                SELECT
+                    pp.*,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY pp.sending_latitude, pp.sending_longitude
+                        ORDER BY pp.timestamp DESC
+                    ) AS rn,
+                    COUNT(*) OVER (
+                        PARTITION BY pp.sending_latitude, pp.sending_longitude
+                    ) AS coord_count
+                FROM packet_path pp
+                WHERE pp.station_id = ?
+                    AND pp.timestamp >= ?
+                    AND pp.number = 0
+                    AND pp.sending_latitude IS NOT NULL
+                    AND pp.sending_longitude IS NOT NULL
+            ) t
+            WHERE t.rn = 1
+            ORDER BY t.timestamp
+            LIMIT ?';
+
 
         $arg = [$stationId, $minTimestamp, $limit];
 
@@ -143,18 +166,49 @@ class PacketPathRepository extends ModelRepository
         }
         $minTimestamp = time() - (60*60*$hours);
 
-        $sql = 'select pp.*
-            from packet_path pp
-                join station s on s.id = pp.sending_station_id
-            where pp.station_id = ?
-                and pp.timestamp >= ?
-                and pp.number = 0
-                and pp.sending_latitude is not null
-                and pp.sending_longitude is not null
-                and pp.sending_latitude != s.latest_confirmed_latitude
-                and pp.sending_longitude != s.latest_confirmed_longitude
-            order by pp.timestamp
-            limit ?';
+        // $sql = 'select pp.*
+        //     from packet_path pp
+        //         join station s on s.id = pp.sending_station_id
+        //     where pp.station_id = ?
+        //         and pp.timestamp >= ?
+        //         and pp.number = 0
+        //         and pp.sending_latitude is not null
+        //         and pp.sending_longitude is not null
+        //         and pp.sending_latitude != s.latest_confirmed_latitude
+        //         and pp.sending_longitude != s.latest_confirmed_longitude
+        //     order by pp.timestamp
+        //     limit ?';
+            $sql = '
+            WITH base AS (
+                SELECT
+                    pp.*,
+                    pp.sending_latitude  AS latk,
+                    pp.sending_longitude AS lonk,
+                    s.latest_confirmed_latitude  AS slatk,
+                    s.latest_confirmed_longitude AS slonk,
+                    COUNT(*) OVER (
+                        PARTITION BY pp.sending_latitude, pp.sending_longitude
+                    ) AS coord_count
+                FROM packet_path pp
+                JOIN station s ON s.id = pp.sending_station_id
+                WHERE pp.station_id = ?
+                    AND pp.timestamp >= ?
+                    AND pp.number = 0
+                    AND pp.sending_latitude  IS NOT NULL
+                    AND pp.sending_longitude IS NOT NULL
+            )
+            , dedup AS (
+                SELECT DISTINCT ON (latk, lonk)
+                    base.*
+                FROM base
+                WHERE (latk, lonk) IS DISTINCT FROM (slatk, slonk)
+                ORDER BY latk, lonk, timestamp DESC  -- garde la plus récente par (lat,lon)
+            )
+            SELECT *
+            FROM dedup
+            ORDER BY timestamp
+            LIMIT ?';
+
 
         $arg = [$stationId, $minTimestamp, $limit];
 
